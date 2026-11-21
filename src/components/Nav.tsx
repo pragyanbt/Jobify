@@ -67,11 +67,11 @@ function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boo
   const item = (on: boolean) => cx(
     "flex items-center gap-3 rounded-xl text-[15px] transition",
     collapsed ? "size-11 justify-center" : "px-3.5 py-2.5",
-    on ? "bg-neutral-100 font-medium text-neutral-950" : "font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950",
+    on ? "bg-white font-medium text-neutral-950 shadow-[0_1px_3px_rgba(15,23,42,0.08)]" : "font-medium text-neutral-600 hover:bg-white hover:text-neutral-950",
   );
 
   return (
-    <aside className={cx("fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-neutral-200 bg-white py-5 transition-[width] duration-200 md:flex", collapsed ? "w-[76px] items-center px-2.5" : "w-64 px-4")}>
+    <aside className={cx("fixed inset-y-0 left-0 z-30 hidden flex-col bg-[var(--app-bg)] py-5 transition-[width] duration-200 md:flex", collapsed ? "w-[76px] items-center px-2.5" : "w-64 px-4")}>
       <div className={cx("flex items-center", collapsed ? "flex-col gap-3" : "justify-between pl-1.5")}>
         <Link href="/home" className="flex items-center gap-2.5" title="Jobify">
           <Logo size={32} />
@@ -104,7 +104,7 @@ function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boo
           <IconHelp className="size-5 shrink-0 text-slate-500" strokeWidth={1.7} />
           {!collapsed && "Help"}
         </button>
-        <div className={cx("mt-2 border-t border-slate-200/80 pt-3", collapsed ? "w-full" : "")}>
+        <div className={cx("mt-2 pt-3", collapsed ? "w-full" : "")}>
           <div className={cx("flex items-center gap-3", collapsed ? "flex-col" : "px-1.5")}>
             <Avatar email={email} />
             {!collapsed && <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800" title={email}>{email || "Signed in"}</span>}

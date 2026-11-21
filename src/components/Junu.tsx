@@ -372,7 +372,7 @@ export function JunuComposer() {
 
   return (
     <div className="sticky bottom-[calc(var(--tabbar-h)+0.75rem)] z-20 mt-6 md:bottom-5">
-      <div className="mx-auto max-w-4xl rounded-2xl border border-neutral-300 bg-white p-3 shadow-[0_12px_40px_rgba(15,23,42,0.18)] sm:p-4">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-neutral-200 bg-white p-3 sm:p-4">
         {busy && (
           <button
             onClick={() => openJunu()}
