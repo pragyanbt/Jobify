@@ -1,4 +1,4 @@
-import { structured, untrusted } from "./client";
+import { CHEAP_MODEL, structured, TAILOR_MODEL, untrusted } from "./client";
 import {
   ApplicationAnswersSchema,
   EmailTriageSchema,
@@ -26,7 +26,10 @@ export async function analyzeJob(input: {
 }): Promise<JobAnalysis> {
   const out = await structured({
     schema: JobAnalysisSchema,
-    effort: "medium",
+    model: CHEAP_MODEL,
+    effort: "low",
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "You analyze job postings for a job-search assistant. Extract requirements precisely " +
       "as stated: don't invent requirements the posting doesn't express, and separate required from " +
@@ -105,8 +108,9 @@ export async function proposeTailoring(input: {
 
   return structured({
     schema: TailorSchema,
-    effort: "high",
-    maxTokens: 64000,
+    model: TAILOR_MODEL,
+    effort: "medium",
+    maxTokens: 16_000,
     system: TAILOR_SYSTEM,
     user: [
       untrusted("job_analysis", JSON.stringify(input.analysis, null, 2)),
@@ -132,7 +136,10 @@ export async function factCheck(input: {
 
   return structured({
     schema: FactCheckSchema,
-    effort: "medium",
+    model: TAILOR_MODEL,
+    effort: "low",
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "You audit resume edits for truthfulness. For each change, decide whether every claim in AFTER " +
       "is supported by the candidate's master resume or approved facts. Flag added skills, tools, " +
@@ -159,7 +166,10 @@ export async function factCheck(input: {
 export async function proposeLatexFix(input: { body: string; preamble: string; error: string; log: string }) {
   return structured({
     schema: LatexFixSchema,
-    effort: "medium",
+    model: CHEAP_MODEL,
+    effort: "low",
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "You fix LaTeX compilation errors in a resume body with minimal find/replace edits. " +
       "Only fix syntax (unescaped specials, unbalanced braces, broken environments, wrong macro arity). " +
@@ -180,7 +190,10 @@ export async function proposeLatexFix(input: { body: string; preamble: string; e
 export async function extractFacts(resumeText: string) {
   return structured({
     schema: FactExtractSchema,
-    effort: "medium",
+    model: CHEAP_MODEL,
+    effort: "low",
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "Extract atomic, verifiable facts from a resume for the candidate to review. One fact per item " +
       "(a skill, a role with dates, a project, a quantified achievement exactly as stated, a certification, a degree). " +
@@ -207,8 +220,9 @@ export async function importResume(input: { templateBodyExample: string; text: s
 
   return structured({
     schema: ImportSchema,
+    model: TAILOR_MODEL,
     effort: "medium",
-    maxTokens: 32000,
+    maxTokens: 16_000,
     system:
       "Convert a resume into the LaTeX body of the given ATS-friendly template, using its macros exactly as " +
       "the example does. Transcribe the content faithfully: keep every section, role, date, number, name, " +
@@ -231,8 +245,10 @@ export async function importResume(input: { templateBodyExample: string; text: s
 export async function extractJobFromPage(pageText: string, url: string) {
   return structured({
     schema: JobPageSchema,
+    model: CHEAP_MODEL,
     effort: "low",
-    maxTokens: 32000,
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "You extract a job posting from the visible text of a web page. Copy the description verbatim; don't " +
       "summarize, reword, or add anything. If the page is not a single job posting, set isJobPosting to false " +
@@ -265,8 +281,9 @@ export async function draftApplicationAnswers(input: {
 }) {
   return structured({
     schema: ApplicationAnswersSchema,
+    model: TAILOR_MODEL,
     effort: "medium",
-    maxTokens: 32000,
+    maxTokens: 12_000,
     system:
       "You fill in a job application form for the candidate, using ONLY their resume and approved profile facts. " +
       "Rules:\n" +
@@ -297,8 +314,10 @@ export async function draftApplicationAnswers(input: {
 export async function triageEmails(emails: { id: string; from: string; subject: string; date: string; text: string }[]) {
   return structured({
     schema: EmailTriageSchema,
+    model: CHEAP_MODEL,
     effort: "low",
-    maxTokens: 16000,
+    maxTokens: 8_000,
+    thinking: false,
     system:
       "You sort a job seeker's emails into updates about their own job applications. Be conservative: job alerts, " +
       "\"jobs you may like\", newsletters, and marketing are unrelated. Summaries state only what the email says. " +

@@ -5,10 +5,15 @@ import { assertCanUseAI } from "../auth";
 import { currentUserId } from "../requestContext";
 import { recordUsage, tokensFromUsage } from "./usage";
 
-export const MODEL = process.env.JOBIFY_MODEL ?? "claude-opus-5-5";
+/** Default for Junu and anything that doesn't pick a cheaper model. Sonnet, not Opus. */
+export const MODEL = process.env.JOBIFY_MODEL ?? "claude-sonnet-4-5";
+/** Resume tailoring (edits + fact-check). Defaults to the same Sonnet. */
+export const TAILOR_MODEL = process.env.JOBIFY_TAILOR_MODEL ?? MODEL;
+/** Light tasks: email triage, page scrape, quick analysis, LaTeX syntax repair. */
+export const CHEAP_MODEL = process.env.JOBIFY_CHEAP_MODEL ?? "claude-haiku-4-5";
 
 let client: Anthropic | null = null;
-function getClient(): Anthropic {
+export function getClient(): Anthropic {
   // Resolves ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / `ant auth login` profile.
   return (client ??= new Anthropic());
 }
@@ -16,9 +21,8 @@ function getClient(): Anthropic {
 export class AIError extends Error {}
 
 /**
- * One structured call: streams (long inputs/outputs), uses adaptive thinking,
- * validates the JSON response against `schema`, and opts into server-side
- * refusal fallbacks so a classifier false-positive doesn't fail a tailoring run.
+ * One structured call: streams (long inputs/outputs), validates JSON against
+ * `schema`, and opts into server-side refusal fallbacks.
  */
 export async function structured<S extends z.ZodType>(opts: {
   schema: S;
@@ -27,23 +31,30 @@ export async function structured<S extends z.ZodType>(opts: {
   user: string | Anthropic.Beta.BetaContentBlockParam[];
   effort?: "low" | "medium" | "high" | "xhigh";
   maxTokens?: number;
+  /** Override the default JOBIFY_MODEL. */
+  model?: string;
+  /** Adaptive thinking burns tokens; off for cheap/low-effort calls. */
+  thinking?: boolean;
 }): Promise<z.infer<S>> {
   const userId = currentUserId();
   if (userId) await assertCanUseAI(userId);
+  const model = opts.model ?? MODEL;
+  const effort = opts.effort ?? "medium";
+  const thinking = opts.thinking ?? effort !== "low";
 
   try {
     const stream = getClient().beta.messages.stream({
-      model: MODEL,
-      max_tokens: opts.maxTokens ?? 32000,
+      model,
+      max_tokens: opts.maxTokens ?? 16_000,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      thinking: { type: "adaptive" },
-      output_config: { effort: opts.effort ?? "high", format: betaZodOutputFormat(opts.schema) },
+      ...(thinking ? { thinking: { type: "adaptive" as const } } : {}),
+      output_config: { effort, format: betaZodOutputFormat(opts.schema) },
       system: opts.system,
       messages: [{ role: "user", content: opts.user }],
     });
     const msg = await stream.finalMessage();
-    void recordUsage({ kind: "structured", model: MODEL, usage: tokensFromUsage(msg.usage), userId });
+    void recordUsage({ kind: "structured", model, usage: tokensFromUsage(msg.usage), userId });
 
     if (msg.stop_reason === "refusal") {
       throw new AIError(

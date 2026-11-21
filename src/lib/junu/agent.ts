@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { assertCanUseAI, ForbiddenError } from "../auth";
-import { MODEL } from "../ai/client";
+import { getClient, MODEL } from "../ai/client";
 import { recordUsage, tokensFromUsage } from "../ai/usage";
 import { junuTools, TOOL_LABELS, type JunuEffect } from "./tools";
 
@@ -39,10 +39,7 @@ Replies:
 - Link to pages with markdown links using the "link" paths your tools return, e.g. [Backend Engineer at Acme](/jobs/abc). Don't invent paths.
 - Plain markdown only: bold, links, short lists. No tables or headings.`;
 
-const MAX_HISTORY_TURNS = 30;
-
-let client: Anthropic | null = null;
-const getClient = () => (client ??= new Anthropic());
+const MAX_HISTORY_TURNS = 20;
 
 /**
  * Run one user turn. `history` is the visible conversation (text only); the
@@ -78,13 +75,12 @@ export async function runJunu(
   const runner = getClient().beta.messages.toolRunner(
     {
       model: MODEL,
-      max_tokens: 16000,
+      max_tokens: 8_000,
       thread: false,
-      max_iterations: 12,
+      max_iterations: 8,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      thinking: { type: "adaptive" },
-      output_config: { effort: "medium" },
+      output_config: { effort: "low" },
       cache_control: { type: "ephemeral" },
       system: SYSTEM,
       tools: junuTools(user.id, (effect) => emit({ type: "effect", effect }), user.email),
