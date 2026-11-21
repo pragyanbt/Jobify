@@ -19,7 +19,8 @@ export default function LoginPage() {
 function Login() {
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
-  const [mode, setMode] = useState<Mode>("signin");
+  // /login?mode=signup opens straight to "Create account" (from the landing page).
+  const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);

@@ -44,9 +44,9 @@ export async function middleware(request: NextRequest) {
       if (PUBLIC_API.some((p) => path.startsWith(p))) return response;
       return NextResponse.json({ error: "Please sign in." }, { status: 401 });
     }
-    if (!PUBLIC_PAGES.some((p) => path.startsWith(p)) && path !== "/setup") {
+    if (!PUBLIC_PAGES.some((p) => path.startsWith(p)) && path !== "/setup" && path !== "/") {
       const url = new URL("/login", request.url);
-      if (path !== "/") url.searchParams.set("next", path + request.nextUrl.search);
+      url.searchParams.set("next", path + request.nextUrl.search);
       return NextResponse.redirect(url);
     }
   } else if (path === "/login" || path === "/") {
