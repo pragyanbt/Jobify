@@ -17,6 +17,7 @@ import {
   IconClock,
   IconSend,
 } from "./icons";
+import { AutopilotProgress } from "./AutopilotProgress";
 import { JunuAvatar } from "./JunuAvatar";
 import { cx, Spinner, Switch, useClickOutside } from "./ui";
 
@@ -160,6 +161,12 @@ function setConfirmFirst(v: boolean) {
     /* storage unavailable */
   }
   setState({ confirmFirst: v });
+}
+
+/** Junu posts a message herself (e.g. Autopilot finished a job). */
+export function postFromJunu(text: string) {
+  ensureLoaded();
+  setState({ msgs: [...state.msgs, { id: uid(), role: "assistant" as const, text }].slice(-MAX_MSGS) });
 }
 
 async function sendToJunu(text: string, page: string | null) {
@@ -330,6 +337,7 @@ export function JunuChatPage() {
         <BackButton onClick={() => back()} />
         <JunuTitle busy={busy} activity={activity} />
       </header>
+      <AutopilotProgress />
       <Messages
         msgs={msgs}
         busy={busy}

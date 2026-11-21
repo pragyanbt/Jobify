@@ -81,10 +81,12 @@ export function ApplyChooser({ job, onClose }: { job: ApplyTarget; onClose: () =
               </Notice>
             )}
             <div className="grid gap-2 sm:grid-cols-2">
-              {result.status === "needs_you" && (
+              {result.status === "needs_you" ? (
                 <Link href={`/jobs/${job.id}/application`} className={buttonClass("primary")} onClick={onClose}>Review answers</Link>
+              ) : (
+                <Link href="/chat" className={buttonClass("primary")} onClick={onClose}>Watch in chat</Link>
               )}
-              <button onClick={onClose} className={buttonClass("secondary", "md", result.status === "needs_you" ? "" : "sm:col-span-2")}>Done</button>
+              <button onClick={onClose} className={buttonClass("secondary")}>Done</button>
             </div>
           </div>
         ) : (
