@@ -1,0 +1,258 @@
+// Jobify data model (Supabase Postgres). Every user-owned row carries the
+// Supabase Auth user id (`userId`) and every query is scoped by it in
+// application code. Row-level security is enabled on all tables with no
+// policies (prisma/rls.sql), so Supabase's public REST API can't read them;
+// only the server (Prisma, as the database owner) can.
+//
+// Structured fields are stored as JSON text and parsed via src/lib/json.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// One row per user (id = Supabase Auth user id).
+model Profile {
+  id               String   @id
+  email            String   @default("")
+  name             String   @default("")
+  /// JSON: ProfileFact[] — atomic, user-approvable facts used as evidence.
+  facts            String   @default("[]")
+  /// JSON: TailoringRules
+  tailoringRules   String   @default("{}")
+  /// JSON: AutoApplySettings
+  autoApply        String   @default("{}")
+  /// JSON: JobSearchSettings
+  jobSearch        String   @default("{}")
+  /// JSON: JobSearchStatus (last run report)
+  jobSearchStatus  String   @default("{}")
+  /// JSON: ApplicationProfile — contact details and standard answers for application forms.
+  applicationProfile String @default("{}")
+  /// JSON: SelfIdentification — OPTIONAL voluntary EEO answers. Opt-in only; never
+  /// sent to Claude, never used for matching or scoring. Defaults to "decline".
+  selfId           String   @default("{}")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+/// A user-owned master resume. Tailoring NEVER writes to this row.
+model MasterResume {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  latex        String
+  isDefault    Boolean  @default(false)
+  /// latex | pdf | docx | text — what the user uploaded.
+  sourceFormat String   @default("latex")
+  /// JSON: ImportNote[] — conversion warnings for the user to review.
+  importNotes  String   @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tailored TailoredResume[]
+
+  @@index([userId])
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  company     String
+  location    String    @default("")
+  url         String    @default("")
+  description String
+  /// Where the job came from: "manual", "link", "greenhouse:stripe", "remotive", ...
+  source      String    @default("manual")
+  /// Stable id from the source, for de-duplication across searches.
+  externalKey String?
+  /// When the employer posted it (from the source), if known.
+  postedAt    DateTime?
+  remote      Boolean   @default(false)
+  /// Title/location relevance to the user's search (0-100), not resume fit.
+  relevance   Float     @default(0)
+  /// Application channel id from src/lib/channels.ts ("manual" by default).
+  channel     String    @default("manual")
+  /// JSON: JobAnalysis | null
+  analysis    String?
+  /// Best master's deterministic score at discovery time (0-100).
+  baseScore   Float?
+  /// discovered (found by search, not yet analyzed) | new | analyzing | analyzed | error
+  status      String    @default("new")
+  error       String?
+  createdAt   DateTime  @default(now())
+
+  tailored     TailoredResume[]
+  applications Application[]
+  draft        ApplicationDraft?
+
+  @@unique([userId, externalKey])
+  @@index([userId, postedAt])
+}
+
+/// Answers Junu prepared for one job's application form, for the user to review.
+/// Jobify never submits these; the user copies them into the employer's form.
+model ApplicationDraft {
+  id         String   @id @default(cuid())
+  userId     String
+  jobId      String   @unique
+  /// greenhouse | standard — where the questions came from.
+  formSource String
+  /// JSON: FormQuestion[]
+  questions  String
+  /// JSON: DraftAnswer[]
+  answers    String
+  /// Resume version to attach (null = master resume).
+  versionId  String?
+  /// draft | reviewed
+  status     String   @default("draft")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// One tailoring run of a master resume for a job. Its content lives in
+/// ResumeVersion rows so every edit/compile is preserved.
+model TailoredResume {
+  id             String   @id @default(cuid())
+  userId         String
+  jobId          String
+  masterId       String
+  /// Snapshot of the master LaTeX at tailoring time, for stable comparison.
+  masterSnapshot String
+  /// Pipeline state: queued | analyzing | tailoring | compiling | validating
+  ///                 | ready | needs_review | approved | failed
+  status         String   @default("queued")
+  /// JSON: PipelineStep[] — progress for the 10-step workflow UI.
+  steps          String   @default("[]")
+  /// JSON: ChangeRecord[]
+  changes        String   @default("[]")
+  /// JSON: MatchReport (original vs tailored)
+  match          String?
+  /// JSON: ValidationReport
+  validation     String?
+  summary        String   @default("")
+  mode           String   @default("manual") // manual | auto
+  error          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  job      Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  master   MasterResume    @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  versions ResumeVersion[]
+
+  @@index([userId])
+}
+
+/// Immutable snapshot of a tailored resume's LaTeX. The compiled PDF lives in
+/// ResumePdf so listing versions never loads PDF bytes.
+model ResumeVersion {
+  id          String   @id @default(cuid())
+  tailoredId  String
+  number      Int
+  latex       String
+  /// ai | autofix | user
+  origin      String
+  note        String   @default("")
+  hasPdf      Boolean  @default(false)
+  pageCount   Int?
+  compileOk   Boolean  @default(false)
+  compileLog  String   @default("")
+  createdAt   DateTime @default(now())
+
+  tailored     TailoredResume @relation(fields: [tailoredId], references: [id], onDelete: Cascade)
+  pdf          ResumePdf?
+  applications Application[]
+
+  @@unique([tailoredId, number])
+}
+
+model ResumePdf {
+  versionId String        @id
+  data      Bytes
+  version   ResumeVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id           String    @id @default(cuid())
+  userId       String
+  jobId        String
+  /// The exact resume version used. Null when the user applied on the
+  /// employer's site with a resume Jobify didn't prepare (channel "external").
+  versionId    String?
+  /// awaiting_approval | ready_manual | submitted | withdrawn
+  status       String    @default("awaiting_approval")
+  /// manual (Jobify-prepared, user submits) | external (user applied on their own)
+  channel      String    @default("manual")
+  /// pending | no_response | rejected | interview | offer
+  outcome      String    @default("pending")
+  notes        String    @default("")
+  reviewReason String    @default("")
+  submittedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  job     Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  version ResumeVersion? @relation(fields: [versionId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+}
+
+/// A connected account (today: Google, for read-only Gmail). Tokens are
+/// encrypted with TOKEN_ENCRYPTION_KEY (AES-256-GCM) before they're stored; the
+/// key lives only in the server environment, never in the database.
+model Integration {
+  id               String    @id @default(cuid())
+  userId           String
+  /// "google"
+  provider         String
+  accountEmail     String    @default("")
+  scopes           String    @default("")
+  refreshTokenEnc  String
+  accessTokenEnc   String?
+  accessExpiresAt  DateTime?
+  lastSyncAt       DateTime?
+  lastError        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([userId, provider])
+}
+
+/// A job-related email, summarized. Only the summary is stored, never the body.
+/// kind "ignored" marks messages checked and found unrelated (so they aren't re-read).
+model InboxUpdate {
+  id               String    @id @default(cuid())
+  userId           String
+  /// Gmail message id
+  messageId        String
+  threadId         String    @default("")
+  receivedAt       DateTime
+  /// application_received | viewed | interview | assessment | rejection | offer | recruiter | other | ignored
+  kind             String
+  /// greenhouse | lever | ashby | workday | email ...
+  via              String    @default("email")
+  company          String    @default("")
+  jobTitle         String    @default("")
+  summary          String    @default("")
+  fromName         String    @default("")
+  subject          String    @default("")
+  jobId            String?
+  applicationId    String?
+  /// Outcome Junu suggests recording: interview | offer | rejected
+  suggestedOutcome String?
+  /// new | seen | done | dismissed
+  status           String    @default("new")
+  createdAt        DateTime  @default(now())
+
+  @@unique([userId, messageId])
+  @@index([userId, receivedAt])
+}

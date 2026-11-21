@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Brand scale: violet, matched to the logo. Use as bg-brand-600, text-brand-700, etc. */
+@theme {
+  --color-brand-50: #f4f1ff;
+  --color-brand-100: #ebe4ff;
+  --color-brand-200: #d8cbff;
+  --color-brand-300: #bba5fd;
+  --color-brand-400: #9c7cf9;
+  --color-brand-500: #7f56f2;
+  --color-brand-600: #6c3ee8;
+  --color-brand-700: #5b2fcf;
+  --color-brand-800: #4b28a8;
+  --color-brand-900: #3e2586;
+}
+
+:root {
+  /* Height of the phone bottom tab bar (h-16 + 1px border + safe area); 0 where it's hidden. */
+  --tabbar-h: calc(4rem + 1px + env(safe-area-inset-bottom));
+  --app-bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #0f172a;
+}
+
+@media (min-width: 768px) {
+  :root { --tabbar-h: 0px; }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  /* Text inputs, selects and textareas. 16px on phones so iOS doesn't zoom on focus. */
+  .input {
+    @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition outline-none placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 disabled:bg-slate-50 disabled:text-slate-500 sm:text-sm;
+  }
+  select.input {
+    @apply appearance-none bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.65rem center;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+  .hint {
+    @apply mt-1 block text-xs leading-relaxed text-slate-500;
+  }
+  .link {
+    @apply font-medium text-brand-700 hover:text-brand-800 hover:underline;
+  }
+  input[type="checkbox"] {
+    @apply size-4 rounded accent-brand-600;
+  }
+}
+
+/* Hide scrollbars on horizontal chip/tab rows while keeping them scrollable. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Diff highlighting */
+.diff-add { background: #dcfce7; color: #14532d; border-radius: 2px; }
+.diff-del { background: #fee2e2; color: #7f1d1d; text-decoration: line-through; border-radius: 2px; }

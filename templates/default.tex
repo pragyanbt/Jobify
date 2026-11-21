@@ -1,0 +1,40 @@
+\documentclass[letterpaper,10pt]{article}
+\usepackage[left=0.6in,right=0.6in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\titleformat{\section}{\normalfont\bfseries\small\uppercase}{}{0em}{}[\vspace{1pt}\titlerule\vspace{2pt}]
+\titlespacing*{\section}{0pt}{6pt}{2pt}
+\setlist[itemize]{leftmargin=1.1em,topsep=1pt,itemsep=0.5pt,parsep=0pt}
+\newcommand{\entry}[4]{\noindent\textbf{#1}\hfill #2\\\textit{#3}\hfill\textit{#4}\vspace{1pt}}
+\begin{document}
+\begin{center}
+  {\Large\textbf{FULL NAME}}\\[2pt]
+  {\small City, ST $\cdot$ email@example.com $\cdot$ (555) 555-5555 $\cdot$ linkedin.com/in/handle}
+\end{center}
+
+\section{Summary}
+One short paragraph.
+
+\section{Skills}
+\noindent\textbf{Languages:} A, B, C\\
+\noindent\textbf{Tools:} D, E, F
+
+\section{Experience}
+\entry{Company}{City, ST}{Title}{Mon YYYY -- Mon YYYY}
+\begin{itemize}
+  \item Bullet describing work.
+\end{itemize}
+
+\section{Projects}
+\noindent\textbf{Project Name}
+\begin{itemize}
+  \item Bullet describing project.
+\end{itemize}
+
+\section{Education}
+\entry{University}{City, ST}{Degree}{YYYY}
+\end{document}

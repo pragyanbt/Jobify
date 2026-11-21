@@ -1,0 +1,642 @@
+{
+ "questions": [
+  {
+   "description": null,
+   "label": "First Name",
+   "required": true,
+   "fields": [
+    {
+     "name": "first_name",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Last Name",
+   "required": true,
+   "fields": [
+    {
+     "name": "last_name",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Email",
+   "required": true,
+   "fields": [
+    {
+     "name": "email",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Phone",
+   "required": true,
+   "fields": [
+    {
+     "name": "phone",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Resume/CV",
+   "required": false,
+   "fields": [
+    {
+     "name": "resume",
+     "type": "input_file",
+     "values": []
+    },
+    {
+     "name": "resume_text",
+     "type": "textarea",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Cover Letter",
+   "required": false,
+   "fields": [
+    {
+     "name": "cover_letter",
+     "type": "input_file",
+     "values": []
+    },
+    {
+     "name": "cover_letter_text",
+     "type": "textarea",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Who is your current or previous employer?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935507",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "What is your current or previous job title?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935508",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Please select the country where you currently reside.\n",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935509",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Australia",
+       "value": 749881936
+      },
+      {
+       "label": "Belgium",
+       "value": 749881937
+      },
+      {
+       "label": "Brazil",
+       "value": 749881938
+      },
+      {
+       "label": "Canada",
+       "value": 749881939
+      },
+      {
+       "label": "Egypt",
+       "value": 749881940
+      },
+      {
+       "label": "France",
+       "value": 749881941
+      },
+      {
+       "label": "Germany",
+       "value": 749881942
+      },
+      {
+       "label": "India",
+       "value": 749881943
+      },
+      {
+       "label": "Indonesia",
+       "value": 749881944
+      },
+      {
+       "label": "Ireland",
+       "value": 749881945
+      },
+      {
+       "label": "Israel",
+       "value": 749881946
+      },
+      {
+       "label": "Italy",
+       "value": 749881947
+      },
+      {
+       "label": "Japan",
+       "value": 749881948
+      },
+      {
+       "label": "Malaysia",
+       "value": 749881949
+      },
+      {
+       "label": "Mexico",
+       "value": 749881950
+      },
+      {
+       "label": "New Zealand",
+       "value": 749881951
+      },
+      {
+       "label": "Poland",
+       "value": 749881952
+      },
+      {
+       "label": "Portugal",
+       "value": 749881953
+      },
+      {
+       "label": "Romania",
+       "value": 749881954
+      },
+      {
+       "label": "Singapore",
+       "value": 749881955
+      },
+      {
+       "label": "South Korea",
+       "value": 749881956
+      },
+      {
+       "label": "Spain",
+       "value": 749881957
+      },
+      {
+       "label": "Sweden",
+       "value": 749881958
+      },
+      {
+       "label": "Switzerland",
+       "value": 749881959
+      },
+      {
+       "label": "Taiwan",
+       "value": 749881960
+      },
+      {
+       "label": "Thailand",
+       "value": 749881961
+      },
+      {
+       "label": "The Netherlands",
+       "value": 749881962
+      },
+      {
+       "label": "UAE",
+       "value": 749881963
+      },
+      {
+       "label": "UK",
+       "value": 749881964
+      },
+      {
+       "label": "US",
+       "value": 749881965
+      },
+      {
+       "label": "Other",
+       "value": 749881966
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Please select the country or countries you anticipate working in for the role in which you are applying.",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935510[]",
+     "type": "multi_value_multi_select",
+     "values": [
+      {
+       "label": "Australia",
+       "value": 749881967
+      },
+      {
+       "label": "Belgium",
+       "value": 749881968
+      },
+      {
+       "label": "Brazil",
+       "value": 749881969
+      },
+      {
+       "label": "Canada",
+       "value": 749881970
+      },
+      {
+       "label": "France",
+       "value": 749881971
+      },
+      {
+       "label": "Germany",
+       "value": 749881972
+      },
+      {
+       "label": "India",
+       "value": 749881973
+      },
+      {
+       "label": "Indonesia",
+       "value": 749881974
+      },
+      {
+       "label": "Ireland",
+       "value": 749881975
+      },
+      {
+       "label": "Israel",
+       "value": 749881976
+      },
+      {
+       "label": "Italy",
+       "value": 749881977
+      },
+      {
+       "label": "Japan",
+       "value": 749881978
+      },
+      {
+       "label": "Luxembourg",
+       "value": 749881979
+      },
+      {
+       "label": "Malaysia",
+       "value": 749881980
+      },
+      {
+       "label": "Mexico",
+       "value": 749881981
+      },
+      {
+       "label": "New Zealand",
+       "value": 749881982
+      },
+      {
+       "label": "Poland",
+       "value": 749881983
+      },
+      {
+       "label": "Portugal",
+       "value": 749881984
+      },
+      {
+       "label": "Romania",
+       "value": 749881985
+      },
+      {
+       "label": "Singapore",
+       "value": 749881986
+      },
+      {
+       "label": "South Korea",
+       "value": 749881987
+      },
+      {
+       "label": "Spain",
+       "value": 749881988
+      },
+      {
+       "label": "Sweden",
+       "value": 749881989
+      },
+      {
+       "label": "Switzerland",
+       "value": 749881990
+      },
+      {
+       "label": "Taiwan",
+       "value": 749881991
+      },
+      {
+       "label": "Thailand",
+       "value": 749881992
+      },
+      {
+       "label": "The Netherlands",
+       "value": 749881993
+      },
+      {
+       "label": "UAE",
+       "value": 749881994
+      },
+      {
+       "label": "UK",
+       "value": 749881995
+      },
+      {
+       "label": "US",
+       "value": 749881996
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Are you authorized to work in the location(s) you selected in your previous response?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935511",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 749881997
+      },
+      {
+       "label": "No",
+       "value": 749881998
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Will you require Stripe to sponsor you for a work permit now or in the future for the location(s) you selected in in your previous response?\n",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935512",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 749881999
+      },
+      {
+       "label": "No",
+       "value": 749882000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "If this role offers the option to work from a remote location, do you plan to work remotely?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935513",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes, I intend to work remotely.",
+       "value": 749882001
+      },
+      {
+       "label": "No, I intend to work from an office location.",
+       "value": 749882002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Have you ever been employed by Stripe or a Stripe affiliate?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935514",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 1
+      },
+      {
+       "label": "No",
+       "value": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Do you opt-in to receive WhatsApp messages from Stripe Recruiting?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_68935515",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 749882003
+      },
+      {
+       "label": "No",
+       "value": 749882004
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "If located in the US, in what city and state do you reside?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_69458440",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  }
+ ],
+ "location_questions": [
+  {
+   "description": null,
+   "label": "Longitude",
+   "required": true,
+   "fields": [
+    {
+     "name": "longitude",
+     "type": "input_hidden",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Latitude",
+   "required": true,
+   "fields": [
+    {
+     "name": "latitude",
+     "type": "input_hidden",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Location",
+   "required": true,
+   "fields": [
+    {
+     "name": "location",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  }
+ ],
+ "compliance": [
+  {
+   "type": "eeoc",
+   "description": null,
+   "questions": [
+    {
+     "required": false,
+     "label": "VeteranStatus",
+     "fields": [
+      {
+       "name": "veteran_status",
+       "type": "multi_value_single_select",
+       "values": [
+        {
+         "label": "I don't wish to answer",
+         "value": "3"
+        },
+        {
+         "label": "I identify as one or more of the classifications of a protected veteran",
+         "value": "2"
+        },
+        {
+         "label": "I am not a protected veteran",
+         "value": "1"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "eeoc",
+   "description": null,
+   "questions": [
+    {
+     "required": false,
+     "label": "Race",
+     "fields": [
+      {
+       "name": "race",
+       "type": "multi_value_single_select",
+       "values": [
+        {
+         "label": "Decline To Self Identify",
+         "value": "8"
+        },
+        {
+         "label": "Two or More Races",
+         "value": "7"
+        },
+        {
+         "label": "Native Hawaiian or Other Pacific Islander",
+         "value": "6"
+        },
+        {
+         "label": "White",
+         "value": "5"
+        },
+        {
+         "label": "Hispanic or Latino",
+         "value": "4"
+        },
+        {
+         "label": "Black or African American",
+         "value": "3"
+        },
+        {
+         "label": "Asian",
+         "value": "2"
+        },
+        {
+         "label": "American Indian or Alaskan Native",
+         "value": "1"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "required": false,
+     "label": "Gender",
+     "fields": [
+      {
+       "name": "gender",
+       "type": "multi_value_single_select",
+       "values": [
+        {
+         "label": "Decline To Self Identify",
+         "value": "3"
+        },
+        {
+         "label": "Female",
+         "value": "2"
+        },
+        {
+         "label": "Male",
+         "value": "1"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "demographic_questions": null
+}
