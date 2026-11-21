@@ -73,7 +73,7 @@ const FAQ = [
 
 export default function Landing() {
   return (
-    <div className="bg-white text-slate-900">
+    <div id="top" className="bg-white text-slate-900">
       <TopBar />
       <Hero />
       <HowItWorks />
@@ -90,7 +90,7 @@ export default function Landing() {
 
 function TopBar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+    <header className="sticky top-0 z-40 bg-brand-50/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo size={32} />
@@ -155,7 +155,7 @@ function HeroVisual() {
 
       <FloatCard className="sm:-left-4 sm:top-[6%]">
         <div className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-xl bg-amber-100 text-amber-700"><IconStar className="size-4 fill-amber-400 text-amber-500" /></span>
+          <span className="grid size-9 place-items-center rounded-xl bg-slate-100 text-slate-900"><IconStar className="size-4 fill-slate-900" /></span>
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Top match</div>
             <div className="text-sm font-semibold">Backend Engineer · Acme</div>
@@ -171,7 +171,7 @@ function HeroVisual() {
           <span className="text-slate-400">→</span>
           <span className="font-bold text-emerald-700">87% match</span>
         </div>
-        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-600"><IconCheck className="size-3.5 text-emerald-600" strokeWidth={2.5} /> Every change backed by your resume</div>
+        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-600"><IconCheck className="size-3.5 text-slate-900" strokeWidth={2.5} /> Every change backed by your resume</div>
       </FloatCard>
 
       <FloatCard className="sm:bottom-[2%] sm:left-[6%]">
@@ -236,7 +236,7 @@ function Features() {
             const Icon = f.icon;
             return (
               <div key={f.title} className="rounded-3xl bg-white p-7 ring-1 ring-slate-200/70 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/5">
-                <span className="grid size-11 place-items-center rounded-2xl bg-brand-50 text-brand-700">
+                <span className="grid size-11 place-items-center rounded-2xl bg-slate-100 text-slate-900">
                   <Icon className="size-5" strokeWidth={2} />
                 </span>
                 <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
@@ -321,19 +321,81 @@ function FinalCta() {
   );
 }
 
+const FOOTER_LINKS: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: "Product",
+    links: [
+      { label: "How it works", href: "#how-it-works" },
+      { label: "Features", href: "#features" },
+      { label: "Privacy", href: "#trust" },
+      { label: "FAQ", href: "#faq" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { label: "Create account", href: SIGN_UP },
+      { label: "Sign in", href: "/login" },
+    ],
+  },
+];
+
 function Footer() {
   return (
-    <footer className="border-t border-slate-200/70">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] text-sm text-slate-500 sm:flex-row sm:px-8">
-        <div className="flex items-center gap-2">
-          <Logo size={24} />
-          <span className="font-semibold text-slate-700">Jobify</span>
-          <span>· Truthful resume tailoring</span>
+    <footer className="relative overflow-hidden bg-gradient-to-b from-white via-brand-50/60 to-brand-50">
+      <div className="pointer-events-none absolute -bottom-40 left-1/2 size-[40rem] -translate-x-1/2 rounded-full bg-brand-200/30 blur-3xl" aria-hidden />
+
+      <div className="relative mx-auto max-w-6xl px-5 pt-16 sm:px-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-12">
+          <div className="col-span-2 max-w-sm lg:col-span-1">
+            <Link href="/" className="flex items-center gap-2.5">
+              <Logo size={34} />
+              <span className="text-xl font-semibold tracking-tight">Jobify</span>
+            </Link>
+            <p className="mt-4 leading-relaxed text-slate-600">
+              A truthful, tailored resume for every job you apply to, with Junu doing the busywork.
+            </p>
+            <div className="mt-6 flex items-center gap-3 rounded-2xl bg-white/80 p-3 pr-4 shadow-sm ring-1 ring-brand-100 backdrop-blur">
+              <Image src="/junu-face.png" alt="" width={44} height={44} className="size-11 shrink-0 rounded-full ring-2 ring-white" />
+              <p className="text-sm leading-snug text-slate-700">
+                <span className="font-semibold text-slate-900">Hi, I&apos;m Junu.</span> Ready when you are.
+              </p>
+              <Link href={SIGN_UP} className="ml-auto shrink-0 rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">
+                Get started
+              </Link>
+            </div>
+          </div>
+
+          {FOOTER_LINKS.map((col) => (
+            <div key={col.title}>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-900">{col.title}</h3>
+              <ul className="mt-4 space-y-3">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="group inline-flex items-center gap-1.5 text-[15px] text-slate-600 transition hover:text-slate-900">
+                      <span className="h-px w-0 bg-slate-900 transition-all group-hover:w-3" aria-hidden />
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="flex gap-6">
-          <a href="#how-it-works" className="hover:text-slate-800">How it works</a>
-          <a href="#faq" className="hover:text-slate-800">FAQ</a>
-          <Link href="/login" className="hover:text-slate-800">Sign in</Link>
+
+        {/* Oversized wordmark */}
+        <p
+          className="pointer-events-none mt-14 select-none bg-gradient-to-b from-brand-300/70 to-brand-100/0 bg-clip-text text-center text-[22vw] font-bold leading-[0.8] tracking-tighter text-transparent lg:text-[13rem]"
+          aria-hidden
+        >
+          Jobify
+        </p>
+
+        <div className="relative -mt-2 flex flex-col items-center justify-between gap-3 border-t border-brand-200/60 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-sm text-slate-500 sm:flex-row">
+          <span>© {new Date().getFullYear()} Jobify · Truthful by design</span>
+          <a href="#top" className="inline-flex items-center gap-1.5 font-medium text-slate-700 hover:text-slate-900">
+            Back to top <span aria-hidden>↑</span>
+          </a>
         </div>
       </div>
     </footer>
