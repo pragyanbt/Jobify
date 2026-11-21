@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, buttonClass, Card, Empty, ErrorNote, Field, Notice, ScorePill, Segmented, Spinner, StatusBadge, Tabs } from "@/components/ui";
 import { IconBriefcase, IconClock, IconExternal, IconFile, IconLink, IconMapPin, IconPlus, IconSearch, IconSparkles, IconX } from "@/components/icons";
+import { ApplyChooser, type ApplyTarget } from "@/components/ApplyChooser";
 import { ImportLocalBanner } from "@/components/ImportLocalBanner";
 import { OnboardingResume } from "@/components/OnboardingResume";
 import { topMatchesFrom, TopMatchesStrip } from "@/components/TopMatches";
 import { api, useApi } from "@/lib/fetcher";
-import { trackApply } from "@/lib/applyTracker";
 import { isApplied, latestMatch, TAILOR_RUNNING } from "@/lib/jobs";
 import { timeAgo } from "@/lib/time";
 import type { JobSearchSettings, JobSearchStatus } from "@/lib/types";
@@ -75,6 +75,7 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
 
   const [err, setErr] = useState<string | null>(null);
   const [tailoring, setTailoring] = useState<string | null>(null);
+  const [chooser, setChooser] = useState<ApplyTarget | null>(null);
 
   async function tailor(jobId: string) {
     setErr(null);
@@ -280,18 +281,20 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
             );
             const score = m ? <ScorePill score={m.tailored.score} from={m.original.score} /> : j.baseScore != null ? <ScorePill score={j.baseScore} /> : null;
             const applied = isApplied(j);
-            const apply = j.url ? (
-              <a
-                href={j.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => { if (!applied) trackApply(j); }}
-                className={buttonClass(applied ? "ghost" : "secondary", "sm", "relative z-10")}
-                title={applied ? "Open the posting" : `Open the ${j.company} application page`}
-              >
-                {applied ? "Posting" : "Apply"} <IconExternal />
+            const apply = !j.url ? null : applied ? (
+              <a href={j.url} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost", "sm", "relative z-10")} title="Open the posting">
+                Posting <IconExternal />
               </a>
-            ) : null;
+            ) : (
+              <button
+                type="button"
+                onClick={() => setChooser({ id: j.id, title: j.title, company: j.company, url: j.url })}
+                className={buttonClass("secondary", "sm", "relative z-10")}
+                title="Apply manually, or ask Junu to apply"
+              >
+                Apply
+              </button>
+            );
             // Unapplied jobs: tailor a resume, or open the one already made.
             const tailorBtn = applied ? null : latest && latest.status !== "failed" ? (
               <Link href={`/studio/tailored/${latest.id}`} className={buttonClass("secondary", "sm", "relative z-10")}>
@@ -353,6 +356,7 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
         Sources: companies&apos; own career sites (via Greenhouse, Lever and Ashby), Remotive
         {search.data?.adzunaConfigured ? ", Adzuna" : ""}. Listings link back to the original posting. * = date found, when the source doesn&apos;t give a posting date.
       </p>
+      {chooser && <ApplyChooser job={chooser} onClose={() => setChooser(null)} />}
     </div>
   );
 }

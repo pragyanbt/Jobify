@@ -5,10 +5,11 @@ import { Badge, Button, Card, ErrorNote, Field, Loading, Notice, PageHeader, Spi
 import { JunuAvatar } from "@/components/JunuAvatar";
 import { IconCheck, IconPlus, IconTrash } from "@/components/icons";
 import { ApplicationProfileCard } from "@/components/ApplicationProfileCard";
+import { AutoSubmitCard } from "@/components/AutoSubmitCard";
 import { ConnectedAccountsCard } from "@/components/ConnectedAccountsCard";
 import { api, useApi } from "@/lib/fetcher";
 import type { LoadedProfile } from "@/lib/profile";
-import type { FactCategory, ProfileFact } from "@/lib/types";
+import { AUTO_SUBMIT_CONSENT, type FactCategory, type ProfileFact } from "@/lib/types";
 
 const CATEGORIES: FactCategory[] = ["skill", "experience", "project", "achievement", "certification", "education", "other"];
 
@@ -57,6 +58,24 @@ export default function SettingsPage() {
 
   if (error) return <ErrorNote error={error} />;
   if (!p) return <Loading />;
+
+  // One switch for Autopilot: tailoring, filling in and submitting (with the user's one-time authorization).
+  const autopilotOn = p.autoApply.enabled && p.autoApply.autoSubmit && !!p.autoApply.consentAt;
+  const toggleAutopilot = (on: boolean) => {
+    if (!on) return setP({ ...p, autoApply: { ...p.autoApply, enabled: false, autoSubmit: false, consentAt: null } });
+    if (!confirm(`Turn on Auto-apply with Junu?\n\n${AUTO_SUBMIT_CONSENT}`)) return;
+    setP({
+      ...p,
+      autoApply: {
+        ...p.autoApply,
+        enabled: true,
+        autoSubmit: true,
+        consentAt: new Date().toISOString(),
+        // "Always review" would hold every application, so nothing could be submitted.
+        review: p.autoApply.review === "always" ? "on_warnings" : p.autoApply.review,
+      },
+    });
+  };
   const dirty = JSON.stringify(p) !== JSON.stringify(data);
   const list = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
   const js = p.jobSearch;
@@ -234,15 +253,17 @@ export default function SettingsPage() {
             <div className="min-w-0 flex-1">
               <Switch
                 label={<span className="text-base font-semibold">Auto-apply with Junu</span>}
-                description="Junu tailors your resume for new jobs that match well and fills in their applications, so they're ready for you to review and submit. Jobify never submits an application without you."
-                checked={p.autoApply.enabled}
-                onChange={(v) => setP({ ...p, autoApply: { ...p.autoApply, enabled: v } })}
+                description={autopilotOn
+                  ? `On since ${new Date(p.autoApply.consentAt!).toLocaleDateString()}. Junu tailors your resume for well-matched jobs, fills in the applications and submits them through Chrome (up to ${p.autoApply.dailyLimit} a day). Anything she can't finish waits for you.`
+                  : "Junu tailors your resume for jobs that match well, fills in the applications and submits them for you. Also lets you use “Ask Junu to apply” on any job."}
+                checked={autopilotOn}
+                onChange={toggleAutopilot}
               />
             </div>
           </div>
         </Card>
 
-        {p.autoApply.enabled ? (
+        {autopilotOn ? (
           <>
             <Card title="Autopilot rules" description="Which jobs Junu works on, and when you review.">
               <div className="space-y-4">
@@ -264,11 +285,15 @@ export default function SettingsPage() {
                     <option value="never">Never: mark ready whenever validation passes</option>
                   </select>
                 </Field>
+                {p.autoApply.review === "always" && (
+                  <Notice tone="warning">With &ldquo;Always&rdquo;, every application waits for your approval, so Junu won&apos;t submit anything on her own.</Notice>
+                )}
                 <p className="text-xs leading-relaxed text-slate-500">
                   Any validation error always sends an application to your review. Remember to save these rules.
                 </p>
               </div>
             </Card>
+            <AutoSubmitCard />
             <Notice tone="info" title="Details Junu needs to fill in applications">
               Junu uses these to answer application forms for you. Fill in at least your name, contact details and work eligibility.
             </Notice>
@@ -277,8 +302,8 @@ export default function SettingsPage() {
         ) : (
           <Card padded>
             <div className="text-sm leading-relaxed text-slate-600">
-              Turn on <b>Auto-apply with Junu</b> above and save to set it up. Junu will then ask for the details it needs to fill in
-              applications (contact details, work eligibility, links).
+              Turn on <b>Auto-apply with Junu</b> above and save to set it up. You&apos;ll then connect the Chrome extension and add the
+              details Junu needs to fill in applications (contact details, work eligibility, links).
             </div>
             {!showDetails ? (
               <button className="link mt-3 text-sm" onClick={() => setShowDetails(true)}>Fill in application details anyway</button>

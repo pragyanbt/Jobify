@@ -8,7 +8,8 @@ import { latexToText } from "./latex/document";
 import { approvedFactsText, getProfile } from "./profile";
 
 // "Prepare application": Junu fills in a job's application form for the user
-// to review. Jobify never submits it.
+// to review. Submitting is done by the user, or by the Chrome extension when
+// automatic submitting is on (see autoSubmit.ts).
 
 export interface PreparedDraft {
   id: string;
@@ -56,7 +57,8 @@ export async function prepareApplication(userId: string, jobId: string, email?: 
   const answers = new Map<string, DraftAnswer>();
   const forAI: FormQuestion[] = [];
   for (const q of form.questions) {
-    const a = answerFromProfile(q, profile, selfId);
+    // With auto-submit authorized, standard statements can be confirmed for the user.
+    const a = answerFromProfile(q, profile, selfId, { authorized: p.autoApply.autoSubmit && !!p.autoApply.consentAt });
     if (a) answers.set(q.id, a);
     else forAI.push(q);
   }

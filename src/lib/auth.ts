@@ -160,7 +160,7 @@ async function ensureProfile(id: string, email: string) {
   return row;
 }
 
-function normalizeStatus(s: string | null | undefined): AccountStatus {
+export function normalizeStatus(s: string | null | undefined): AccountStatus {
   if (s === "active" || s === "paused" || s === "banned" || s === "pending") return s;
   return "pending";
 }

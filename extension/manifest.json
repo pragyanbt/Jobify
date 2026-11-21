@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Jobify Autopilot",
+  "version": "0.1.0",
+  "description": "Lets Junu submit your prepared job applications automatically, in your own browser.",
+  "permissions": ["storage", "alarms", "tabs", "scripting"],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*.vercel.app/*",
+    "https://job-boards.greenhouse.io/*",
+    "https://boards.greenhouse.io/*",
+    "https://jobs.lever.co/*",
+    "https://jobs.eu.lever.co/*",
+    "https://jobs.ashbyhq.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "Jobify Autopilot",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+}

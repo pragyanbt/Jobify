@@ -141,6 +141,31 @@ export function pickOption(q: FormQuestion, want: string | RegExp): string | nul
   );
 }
 
+const MARKETING_RE = /whatsapp|sms|text messages?|marketing|newsletter|promotional|job alerts?|talent community|future (roles|opportunities)/i;
+const ATTEST_RE = /certify|accurate|true and complete|acknowledg|i agree|agree to|consent to (the )?(processing|collection)|privacy (policy|notice)|terms/i;
+const YES_RE = /^\s*(yes|i agree|agree|i acknowledge|acknowledge|i certify|i consent|i accept|accept|confirm)/i;
+const NO_RE = /^\s*(no|i do not|i don.?t|decline|do not)/i;
+
+/**
+ * Consent questions. Without the user's auto-submit authorization they're always
+ * left to the user. With it: marketing opt-ins are answered "no" (or left blank),
+ * and required standard statements (accuracy, privacy acknowledgement) are confirmed.
+ */
+function consentAnswer(q: FormQuestion, authorized: boolean): DraftAnswer {
+  if (!authorized) return needsYou(q, "Your decision: Jobify never agrees or opts in on your behalf.");
+  const text = `${q.label} ${q.description ?? ""}`;
+  if (MARKETING_RE.test(text)) {
+    const no = pickOption(q, NO_RE);
+    if (no) return { questionId: q.id, value: q.kind === "multiselect" ? [] : no, source: "authorized", note: "Not opting in to messages." };
+    return q.required ? needsYou(q, "This form requires a marketing opt-in answer; Junu won't opt you in.") : { questionId: q.id, value: q.kind === "multiselect" ? [] : "", source: "authorized", note: "Left unchecked." };
+  }
+  if (ATTEST_RE.test(text)) {
+    const yes = q.options?.length ? pickOption(q, YES_RE) ?? (q.options.length === 1 ? q.options[0].value : null) : "Yes";
+    if (yes) return { questionId: q.id, value: q.kind === "multiselect" ? [yes] : yes, source: "authorized", note: "Confirmed under your auto-submit authorization." };
+  }
+  return q.required ? needsYou(q, "Junu isn't sure what this statement commits you to, so it's left for you.") : { questionId: q.id, value: "", source: "authorized", note: "Optional; left blank." };
+}
+
 /** Hint for answers that come from the application profile. */
 const missing = (what: string) => `Add your ${what} in Settings → Autopilot.`;
 
@@ -191,11 +216,14 @@ function selfIdAnswer(q: FormQuestion, s: SelfIdentification): DraftAnswer {
  * need the resume (Claude). Self-identification and consent questions are
  * always answered here, never by Claude.
  */
-export function answerFromProfile(q: FormQuestion, p: ApplicationProfile, selfId: SelfIdentification): DraftAnswer | null {
+export function answerFromProfile(
+  q: FormQuestion,
+  p: ApplicationProfile,
+  selfId: SelfIdentification,
+  opts: { authorized?: boolean } = {},
+): DraftAnswer | null {
   if (q.section === "self_id") return selfIdAnswer(q, selfId);
-  if (q.section === "consent") {
-    return needsYou(q, "Your decision: Jobify never agrees or opts in on your behalf.");
-  }
+  if (q.section === "consent") return consentAnswer(q, !!opts.authorized);
   if (q.kind === "file") {
     if (/resume|cv/i.test(`${q.id} ${q.label}`)) return { questionId: q.id, value: "resume", source: "attachment" };
     return needsYou(q, q.required ? "Required by this employer." : "Optional.");

@@ -117,7 +117,7 @@ async function newJob(userId = USER) {
 describe("tailoring pipeline", () => {
   it("tailors truthfully, compiles, validates, and goes to the approval queue in auto mode", async () => {
     await profile.saveProfile(USER, {
-      autoApply: { enabled: true, minBaseScore: 0, review: "always", dailyLimit: 5 },
+      autoApply: { enabled: true, minBaseScore: 0, review: "always", dailyLimit: 5, autoSubmit: false, consentAt: null },
     });
     const job = await newJob();
     const id = await pipeline.startTailoring(USER, job.id, "auto");

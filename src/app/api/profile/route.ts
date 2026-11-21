@@ -31,7 +31,10 @@ const Body = z.object({
       minBaseScore: z.number().min(0).max(100),
       review: z.enum(["always", "on_warnings", "never"]),
       dailyLimit: z.number().int().min(0).max(100),
+      autoSubmit: z.boolean().default(false),
+      consentAt: z.string().datetime().nullable().default(null),
     })
+    .refine((a) => !a.autoSubmit || a.consentAt, { message: "Authorize Junu to submit for you before turning on automatic submitting." })
     .optional(),
   jobSearch: z
     .object({

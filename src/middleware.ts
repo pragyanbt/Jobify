@@ -7,7 +7,8 @@ import { SUPABASE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 // verify the user themselves (requireUser) — this is the first line only.
 
 const PUBLIC_PAGES = ["/login", "/auth", "/pending", "/blocked"];
-const PUBLIC_API = ["/api/discovery", "/api/health"];
+// /api/extension/* authenticates with the extension key (Bearer), checked in each route.
+const PUBLIC_API = ["/api/discovery", "/api/health", "/api/extension"];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;

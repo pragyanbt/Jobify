@@ -29,6 +29,7 @@ const SOURCE: Record<AnswerSource, { label: string; tone: "green" | "indigo" | "
   decline: { label: "Declined", tone: "slate" },
   self_id: { label: "Your choice", tone: "slate" },
   user: { label: "Edited by you", tone: "green" },
+  authorized: { label: "Confirmed for you", tone: "slate" },
   needs_you: { label: "Needs your answer", tone: "amber" },
 };
 

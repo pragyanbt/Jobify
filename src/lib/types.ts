@@ -39,9 +39,19 @@ export interface AutoApplySettings {
   /** always: everything goes to the queue; on_warnings: only clean runs skip
    *  the queue; never: submit whenever validation has no errors. */
   review: "always" | "on_warnings" | "never";
-  /** Max automatic tailoring runs per day. */
+  /** Max automatic tailoring runs per day (also caps automatic submissions). */
   dailyLimit: number;
+  /** Fully automatic: the Jobify Chrome extension submits ready applications. */
+  autoSubmit: boolean;
+  /** When the user authorized Junu to submit and attest for them (ISO), or null. */
+  consentAt: string | null;
 }
+
+/** What the user agrees to when turning on fully automatic submitting. */
+export const AUTO_SUBMIT_CONSENT =
+  "I authorize Junu to submit job applications on my behalf, using my resume and application profile, and to confirm " +
+  "standard statements such as \"the information I provided is accurate\". Junu won't opt me into marketing messages " +
+  "and won't answer questions it can't answer truthfully.";
 
 export const DEFAULT_RULES: TailoringRules = {
   maxPages: 1,
@@ -56,6 +66,8 @@ export const DEFAULT_AUTO_APPLY: AutoApplySettings = {
   minBaseScore: 55,
   review: "always",
   dailyLimit: 10,
+  autoSubmit: false,
+  consentAt: null,
 };
 
 export interface AnalyzedTerm {

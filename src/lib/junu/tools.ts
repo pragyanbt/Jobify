@@ -358,8 +358,8 @@ export function junuTools(userId: string, onEffect: (e: JunuEffect) => void, ema
     name: "prepare_application",
     description:
       "Fill in a job's application form for the user to review: contact details and eligibility from their application " +
-      "profile, other answers from their resume, and the tailored resume to attach. Takes up to a minute. Jobify never " +
-      "submits it: the user reviews the answers on the returned page and submits on the employer's site. Voluntary " +
+      "profile, other answers from their resume, and the tailored resume to attach. Takes up to a minute. This does not " +
+      "submit it: the user reviews the answers on the returned page and submits (or Autopilot's extension does, if on). Voluntary " +
       "self-identification and consent questions are handled by the app, not by you.",
     inputSchema: z.object({ job_id: z.string() }),
     run: async ({ job_id }) => {

@@ -22,6 +22,7 @@ export type AnswerSource =
   | "decline"     // self-identification left as "decline"
   | "self_id"     // from the user's opted-in self-identification
   | "user"        // typed or changed by the user
+  | "authorized"  // a standard statement the user authorized Junu to confirm (auto-submit)
   | "needs_you";  // the user must answer
 
 export interface DraftAnswer {

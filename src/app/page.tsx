@@ -51,7 +51,7 @@ const PROMISES = [
 const FAQ = [
   {
     q: "Does Jobify submit applications for me?",
-    a: "No. Junu finds jobs, tailors your resume and fills in the application, then you review it and submit it on the employer's site. You stay in control of everything sent in your name.",
+    a: "Only if you want it to. By default Junu finds jobs, tailors your resume and fills in the application, and you submit it. Turn on automatic submitting and the Jobify Chrome extension applies for you in your own browser, within your daily limit, and hands back anything it can't finish truthfully.",
   },
   {
     q: "Will Junu add skills I don't have?",

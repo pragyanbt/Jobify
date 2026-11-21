@@ -138,6 +138,14 @@ model ApplicationDraft {
   versionId  String?
   /// draft | reviewed
   status     String   @default("draft")
+  /// Auto-submit by the Jobify Chrome extension:
+  /// none | queued | submitting | submitted | needs_you | failed
+  submitStatus   String    @default("none")
+  /// Why it needs the user / what went wrong / confirmation text.
+  submitNote     String    @default("")
+  claimedAt      DateTime?
+  submitAttempts Int       @default(0)
+  submittedAt    DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -282,4 +290,14 @@ model InboxUpdate {
 
   @@unique([userId, messageId])
   @@index([userId, receivedAt])
+}
+
+/// Access key for the Jobify Chrome extension (auto-submit). Only a SHA-256
+/// hash is stored; the key is shown to the user once.
+model ExtensionToken {
+  id         String    @id @default(cuid())
+  userId     String    @unique
+  tokenHash  String    @unique
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
 }

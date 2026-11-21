@@ -22,7 +22,7 @@ export const POST = authed<{ id: string }>(async (_req, user, { params }) => {
 const Answer = z.object({
   questionId: z.string().max(200),
   value: z.union([z.string().max(20_000), z.array(z.string().max(500)).max(100)]),
-  source: z.enum(["profile", "resume", "drafted", "attachment", "decline", "self_id", "user", "needs_you"]),
+  source: z.enum(["profile", "resume", "drafted", "attachment", "decline", "self_id", "user", "authorized", "needs_you"]),
   note: z.string().max(1000).optional(),
 });
 

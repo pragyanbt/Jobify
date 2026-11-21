@@ -14,6 +14,7 @@ alter table "Application"    enable row level security;
 alter table "ApplicationDraft" enable row level security;
 alter table "Integration"    enable row level security;
 alter table "InboxUpdate"    enable row level security;
+alter table "ExtensionToken" enable row level security;
 alter table "ApiUsage"       enable row level security;
 
 -- Belt and braces: remove API-role privileges entirely.

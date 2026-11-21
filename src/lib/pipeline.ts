@@ -537,6 +537,19 @@ async function finishAuto(id: string, validation: ValidationReport) {
   const autoSubmit = validation.ok && v.compileOk && v.hasPdf && autoApply.review !== "always" &&
     !(autoApply.review === "on_warnings" && warnings) && channel.canAutoSubmit;
 
+  // Fully automatic (Chrome extension): a clean, compiled resume is approved and its
+  // application prepared and queued; the extension submits it. Errors still go to review.
+  if (autoApply.autoSubmit && autoApply.consentAt && validation.ok && v.compileOk && v.hasPdf && autoApply.review !== "always" && !(autoApply.review === "on_warnings" && warnings)) {
+    await prisma.application.create({
+      data: { userId: t.userId, jobId: t.jobId, versionId: v.id, channel: "extension", status: "ready_manual", reviewReason: "" },
+    });
+    await prisma.tailoredResume.update({ where: { id }, data: { status: "approved" } });
+    const { queueForSubmission } = await import("./autoSubmit");
+    const q = await queueForSubmission(t.userId, t.jobId);
+    await setStep(id, "approve", "done", q.queued ? "Auto-approved: Junu will submit it" : `Auto-approved; needs you: ${q.reason}`);
+    return;
+  }
+
   if (autoSubmit) {
     await setStep(id, "approve", "done", "Auto-approved by your rules");
     await submitVersion({
