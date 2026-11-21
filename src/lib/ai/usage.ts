@@ -28,6 +28,9 @@ export async function recordUsage(opts: {
     outputTokens,
     cacheReadTokens,
     cacheWriteTokens,
+    // One request's prompt length picks Haiku 5.5's rate card. Junu's usage sums several
+    // requests (each well under 100K tokens), so it uses the standard rate.
+    promptTokens: opts.kind === "structured" ? inputTokens + cacheReadTokens + cacheWriteTokens : 0,
   });
   try {
     await prisma.apiUsage.create({

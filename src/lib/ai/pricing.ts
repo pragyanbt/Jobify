@@ -23,11 +23,17 @@ function num(key: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function ratesFor(model: string): Rates {
+/** Claude Haiku 5.5: two rate cards chosen by prompt length (100K tokens or fewer vs. longer). */
+const HAIKU_5_5 = (longPrompt: boolean): Rates => {
+  const input = longPrompt ? 0.5 : 0.1;
+  return { input, output: longPrompt ? 2.5 : 0.5, cacheRead: input * 0.1, cacheWrite: input * 1.25 };
+};
+const HAIKU_4_5: Rates = { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 };
+
+function ratesFor(model: string, promptTokens = 0): Rates {
   const m = model.toLowerCase();
-  if (m.includes("haiku")) {
-    return { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 };
-  }
+  if (m.includes("haiku-5")) return HAIKU_5_5(promptTokens > 100_000);
+  if (m.includes("haiku")) return HAIKU_4_5;
   if (m.includes("sonnet")) return SONNET;
   return OPUS;
 }
@@ -38,8 +44,10 @@ export function estimateCostUsd(opts: {
   outputTokens: number;
   cacheReadTokens?: number;
   cacheWriteTokens?: number;
+  /** Prompt length of a single request, for models whose rate depends on it (Haiku 5.5). */
+  promptTokens?: number;
 }): number {
-  const r = ratesFor(opts.model);
+  const r = ratesFor(opts.model, opts.promptTokens ?? 0);
   const cacheRead = opts.cacheReadTokens ?? 0;
   const cacheWrite = opts.cacheWriteTokens ?? 0;
   // Cache tokens are billed separately; the SDK often still reports them under input.

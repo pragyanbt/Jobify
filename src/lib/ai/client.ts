@@ -5,12 +5,25 @@ import { assertCanUseAI } from "../auth";
 import { currentUserId } from "../requestContext";
 import { recordUsage, tokensFromUsage } from "./usage";
 
-/** Default for Junu and anything that doesn't pick a cheaper model. Sonnet, not Opus. */
-export const MODEL = process.env.JOBIFY_MODEL ?? "claude-sonnet-4-5";
-/** Resume tailoring (edits + fact-check). Defaults to the same Sonnet. */
+// Claude Haiku 5.5 everywhere by default: the lowest-cost current model
+// ($0.10 / $0.50 per million input/output tokens for prompts up to 100K tokens).
+// Each role can be overridden with an env var.
+/** Junu and anything that doesn't pick another model. */
+export const MODEL = process.env.JOBIFY_MODEL ?? "claude-haiku-5-5";
+/** Resume tailoring (edits + fact-check). */
 export const TAILOR_MODEL = process.env.JOBIFY_TAILOR_MODEL ?? MODEL;
 /** Light tasks: email triage, page scrape, quick analysis, LaTeX syntax repair. */
-export const CHEAP_MODEL = process.env.JOBIFY_CHEAP_MODEL ?? "claude-haiku-4-5";
+export const CHEAP_MODEL = process.env.JOBIFY_CHEAP_MODEL ?? MODEL;
+
+/**
+ * Server-side refusal fallbacks exist only for some models (not Haiku). Spread into a
+ * request: `...fallbackParams(model)`.
+ */
+export function fallbackParams(model: string) {
+  return /opus-5|sonnet-5-5|fable|mythos/.test(model)
+    ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+    : {};
+}
 
 let client: Anthropic | null = null;
 export function getClient(): Anthropic {
@@ -22,7 +35,7 @@ export class AIError extends Error {}
 
 /**
  * One structured call: streams (long inputs/outputs), validates JSON against
- * `schema`, and opts into server-side refusal fallbacks.
+ * `schema`, and opts into server-side refusal fallbacks where the model has them.
  */
 export async function structured<S extends z.ZodType>(opts: {
   schema: S;
@@ -46,8 +59,7 @@ export async function structured<S extends z.ZodType>(opts: {
     const stream = getClient().beta.messages.stream({
       model,
       max_tokens: opts.maxTokens ?? 16_000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
+      ...fallbackParams(model),
       ...(thinking ? { thinking: { type: "adaptive" as const } } : {}),
       output_config: { effort, format: betaZodOutputFormat(opts.schema) },
       system: opts.system,

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { assertCanUseAI, ForbiddenError } from "../auth";
-import { getClient, MODEL } from "../ai/client";
+import { fallbackParams, getClient, MODEL } from "../ai/client";
 import { recordUsage, tokensFromUsage } from "../ai/usage";
 import { junuTools, TOOL_LABELS, type JunuEffect } from "./tools";
 
@@ -78,8 +78,7 @@ export async function runJunu(
       max_tokens: 8_000,
       thread: false,
       max_iterations: 8,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
+      ...fallbackParams(MODEL),
       output_config: { effort: "low" },
       cache_control: { type: "ephemeral" },
       system: SYSTEM,
