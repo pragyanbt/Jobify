@@ -139,20 +139,20 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
   const errors = st?.reports?.filter((r) => r.error) ?? [];
 
   return (
-    <div className="space-y-5">
-      <header className="space-y-1">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
+    <div className="space-y-6">
+      <header className="space-y-3">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <div className="min-w-0 space-y-1.5">
             <p className="text-sm font-medium text-slate-500" suppressHydrationWarning>
               {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
             </p>
-            <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight text-slate-900 sm:text-[32px]">{headline}</h1>
+            <h1 className="text-[26px] font-bold leading-tight tracking-tight text-slate-900 sm:text-[32px]">{headline}</h1>
           </div>
-          <div className="flex shrink-0 gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
+          <div className="flex shrink-0 gap-2.5 [&>*]:flex-1 sm:[&>*]:flex-none">
             <Button onClick={() => setOpen((o) => !o)}>
               {open ? <IconX /> : <IconPlus />} {open ? "Close" : "Add job"}
             </Button>
-            <Button variant="primary" onClick={searchNow} disabled={running} className="px-4">
+            <Button variant="primary" onClick={searchNow} disabled={running}>
               {running ? <Spinner /> : <IconSearch />} {running ? "Searching…" : "Find new jobs"}
             </Button>
           </div>
@@ -172,7 +172,7 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
         </p>
       </header>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2.5 text-xs text-slate-500">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-xs text-slate-500">
         {running ? (
           <span className="flex items-center gap-2 text-brand-700">
             <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-400 opacity-75" /><span className="relative inline-flex size-2 rounded-full bg-brand-600" /></span>
@@ -203,19 +203,19 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
       {open && <AddJob onAdded={(id) => { setOpen(false); router.push(`/jobs/${id}`); }} />}
       <ErrorNote error={err ?? jobs.error ?? search.error} />
 
-      <div className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="space-y-4">
+        <div className="flex flex-col gap-2.5 sm:flex-row">
           <div className="relative flex-1">
-            <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-            <input className="input pl-9" type="search" placeholder="Search title, company, location" value={q} onChange={(e) => setQ(e.target.value)} />
+            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <input className="input pl-10" type="search" placeholder="Search title, company, location" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex">
-            <select className="input sm:w-36" value={jobType} onChange={(e) => setJobType(e.target.value as typeof jobType)} aria-label="Job type">
+          <div className="grid grid-cols-2 gap-2.5 sm:flex">
+            <select className="input sm:w-40" value={jobType} onChange={(e) => setJobType(e.target.value as typeof jobType)} aria-label="Job type">
               <option value="any">All job types</option>
               <option value="remote">Remote</option>
               <option value="onsite">On-site / hybrid</option>
             </select>
-            <select className="input sm:w-40" value={age} onChange={(e) => setAge(Number(e.target.value))} aria-label="Posted within">
+            <select className="input sm:w-44" value={age} onChange={(e) => setAge(Number(e.target.value))} aria-label="Posted within">
               {AGE_OPTIONS.map((o) => <option key={o.v} value={o.v}>{o.label}</option>)}
             </select>
           </div>
@@ -305,15 +305,15 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
               </Button>
             );
             return (
-              <li key={j.id} className="relative px-4 py-4 transition hover:bg-slate-50/80 sm:px-5">
+              <li key={j.id} className="relative px-4 py-5 transition hover:bg-slate-50/80 sm:px-5">
                 <div className="flex gap-3.5">
                   <CompanyMark name={j.company} />
                   <div className="min-w-0 flex-1">
                     <Link href={`/jobs/${j.id}`} className="line-clamp-2 font-medium leading-snug text-slate-900 after:absolute after:inset-0 hover:text-brand-700">
                       {j.title}
                     </Link>
-                    <div className="mt-0.5 truncate text-sm text-slate-600">{j.company}</div>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                    <div className="mt-1 truncate text-sm text-slate-600">{j.company}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-500">
                       {j.location && (
                         <span className="flex min-w-0 max-w-full items-center gap-1">
                           <IconMapPin className="size-3.5 shrink-0 text-slate-400" />
@@ -333,9 +333,9 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
                     <div className="flex items-center gap-2">{tailorBtn}{apply}</div>
                   </div>
                 </div>
-                <div className="mt-3 space-y-3 pl-[3.25rem] sm:hidden">
-                  {(score || status) && <div className="flex flex-wrap items-center gap-1.5">{score}{status}</div>}
-                  {(tailorBtn || apply) && <div className="grid grid-cols-2 gap-2 [&>*:only-child]:col-span-2">{tailorBtn}{apply}</div>}
+                <div className="mt-3.5 space-y-3 pl-[3.25rem] sm:hidden">
+                  {(score || status) && <div className="flex flex-wrap items-center gap-2">{score}{status}</div>}
+                  {(tailorBtn || apply) && <div className="grid grid-cols-2 gap-2.5 [&>*:only-child]:col-span-2">{tailorBtn}{apply}</div>}
                 </div>
               </li>
             );
@@ -368,7 +368,7 @@ function jobStage(j: JobRow): Exclude<View, "all"> {
 
 function CompanyMark({ name }: { name: string }) {
   return (
-    <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-neutral-200 bg-neutral-50 text-sm font-semibold text-neutral-800">
+    <span className="grid size-10 shrink-0 place-items-center rounded-2xl border border-neutral-200 bg-neutral-50 text-sm font-semibold text-neutral-800">
       {(name.trim()[0] ?? "?").toUpperCase()}
     </span>
   );

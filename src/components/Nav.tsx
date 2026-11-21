@@ -47,11 +47,11 @@ export function AppShell({ email, children }: { email: string | null; children: 
       <MobileTopBar email={email} />
       {chat ? (
         // Chat pages fill the space between the top bar and the tab bar (phones) or the window (desktop).
-        <main className="fixed inset-x-0 bottom-[var(--tabbar-h)] top-[calc(3.5rem+1px+env(safe-area-inset-top))] flex flex-col md:static md:mx-auto md:h-dvh md:max-w-7xl md:px-8 md:py-6">
+        <main className="fixed inset-x-0 bottom-[var(--tabbar-h)] top-[calc(3.5rem+1px+env(safe-area-inset-top))] flex flex-col md:static md:mx-auto md:h-dvh md:max-w-7xl md:px-8 md:py-8">
           {children}
         </main>
       ) : (
-        <main className="mx-auto w-full max-w-7xl px-4 pb-[calc(var(--tabbar-h)+2rem)] pt-4 sm:px-6 md:px-8 md:pb-12 md:pt-6">
+        <main className="mx-auto w-full max-w-7xl px-4 pb-[calc(var(--tabbar-h)+2.5rem)] pt-5 sm:px-6 md:px-8 md:pb-14 md:pt-8">
           {children}
         </main>
       )}
@@ -65,24 +65,24 @@ export function AppShell({ email, children }: { email: string | null; children: 
 function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boolean; onToggle: () => void }) {
   const active = useActive();
   const item = (on: boolean) => cx(
-    "flex items-center gap-3 rounded-xl text-[15px] transition",
-    collapsed ? "size-11 justify-center" : "px-3.5 py-2.5",
+    "flex items-center gap-3 rounded-full text-[15px] transition",
+    collapsed ? "size-11 justify-center" : "px-4 py-2.5",
     on ? "bg-white font-medium text-neutral-950 shadow-[0_1px_3px_rgba(15,23,42,0.08)]" : "font-medium text-neutral-600 hover:bg-white hover:text-neutral-950",
   );
 
   return (
-    <aside className={cx("fixed inset-y-0 left-0 z-30 hidden flex-col bg-[var(--app-bg)] py-5 transition-[width] duration-200 md:flex", collapsed ? "w-[76px] items-center px-2.5" : "w-64 px-4")}>
+    <aside className={cx("fixed inset-y-0 left-0 z-30 hidden flex-col bg-[var(--app-bg)] py-6 transition-[width] duration-200 md:flex", collapsed ? "w-[76px] items-center px-2.5" : "w-64 px-4")}>
       <div className={cx("flex items-center", collapsed ? "flex-col gap-3" : "justify-between pl-1.5")}>
         <Link href="/home" className="flex items-center gap-2.5" title="Jobify">
           <Logo size={32} />
           {!collapsed && <span className="text-[17px] font-semibold tracking-tight text-neutral-950">Jobify</span>}
         </Link>
-        <button onClick={onToggle} className="grid size-8 place-items-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-700" title={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        <button onClick={onToggle} className="grid size-9 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700" title={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
           <IconSidebar className="size-[18px]" />
         </button>
       </div>
 
-      <nav className={cx("mt-8 flex flex-1 flex-col gap-1", collapsed && "items-center")}>
+      <nav className={cx("mt-8 flex flex-1 flex-col gap-1.5", collapsed && "items-center")}>
         {LINKS.map((l) => {
           const on = active(l.href);
           const Icon = l.icon;
@@ -104,12 +104,12 @@ function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boo
           <IconHelp className="size-5 shrink-0 text-slate-500" strokeWidth={1.7} />
           {!collapsed && "Help"}
         </button>
-        <div className={cx("mt-2 pt-3", collapsed ? "w-full" : "")}>
+        <div className={cx("mt-3 pt-3", collapsed ? "w-full" : "")}>
           <div className={cx("flex items-center gap-3", collapsed ? "flex-col" : "px-1.5")}>
             <Avatar email={email} />
             {!collapsed && <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800" title={email}>{email || "Signed in"}</span>}
             <form action="/auth/signout" method="post">
-              <button className="grid size-8 place-items-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-700" title="Sign out" aria-label="Sign out">
+              <button className="grid size-9 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700" title="Sign out" aria-label="Sign out">
                 <IconLogout className="size-4" />
               </button>
             </form>

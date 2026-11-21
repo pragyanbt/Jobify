@@ -186,7 +186,7 @@ export default function SettingsPage() {
                     <input type="checkbox" checked={f.approved} onChange={(e) => upd({ approved: e.target.checked })} /> Approved
                   </label>
                   {f.source === "extracted" && <Badge>extracted</Badge>}
-                  <button className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950" onClick={() => setP({ ...p, facts: p.facts.filter((_, j) => j !== i) })}>
+                  <button className="ml-auto flex items-center gap-1 rounded-full px-2.5 py-1 text-xs text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950" onClick={() => setP({ ...p, facts: p.facts.filter((_, j) => j !== i) })}>
                     <IconTrash className="size-3.5" /> Remove
                   </button>
                 </div>

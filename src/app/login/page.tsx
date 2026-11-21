@@ -97,7 +97,7 @@ function Login() {
         </>
       )}
 
-      <form onSubmit={submit} className={google && mode !== "reset" ? "space-y-4" : "mt-6 space-y-4"}>
+      <form onSubmit={submit} className={google && mode !== "reset" ? "space-y-5" : "mt-7 space-y-5"}>
         <Field label="Email">
           <input className="input" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </Field>
@@ -126,7 +126,7 @@ function Login() {
             />
           </Field>
         )}
-        <Button variant="primary" className="h-11 w-full text-[15px] sm:h-10" disabled={busy}>
+        <Button variant="primary" className="h-12 w-full text-[15px] sm:h-11" disabled={busy}>
           {busy && <Spinner />}
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
         </Button>

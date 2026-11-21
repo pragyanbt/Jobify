@@ -173,7 +173,7 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
                   <button
                     onClick={() => act(u, "dismiss")}
                     disabled={busy}
-                    className="absolute right-2 top-2.5 grid size-7 place-items-center rounded-md text-slate-300 opacity-100 hover:bg-white hover:text-slate-600 sm:opacity-0 sm:group-hover:opacity-100"
+                    className="absolute right-2 top-2.5 grid size-7 place-items-center rounded-full text-slate-300 opacity-100 hover:bg-white hover:text-slate-600 sm:opacity-0 sm:group-hover:opacity-100"
                     aria-label="Dismiss"
                     title="Dismiss"
                   >

@@ -218,7 +218,7 @@ export default function ApplicationPage() {
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-xs leading-relaxed text-slate-500">{a?.note}</p>
                       {text && q.kind !== "file" && (
-                        <button onClick={() => copy(q.id, text)} className="shrink-0 rounded-md px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50">
+                        <button onClick={() => copy(q.id, text)} className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50">
                           {copied === q.id ? "Copied ✓" : "Copy"}
                         </button>
                       )}

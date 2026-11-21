@@ -56,7 +56,7 @@ body {
 @layer components {
   /* Text inputs, selects and textareas. 16px on phones so iOS doesn't zoom on focus. */
   .input {
-    @apply block w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-base text-neutral-950 transition outline-none placeholder:text-neutral-400 focus:border-neutral-950 focus:ring-4 focus:ring-neutral-950/10 disabled:bg-neutral-50 disabled:text-neutral-500 sm:text-sm;
+    @apply block w-full rounded-2xl border border-neutral-300 bg-white px-3.5 py-2.5 text-base text-neutral-950 transition outline-none placeholder:text-neutral-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 disabled:bg-neutral-50 disabled:text-neutral-500 sm:text-sm;
   }
   select.input {
     @apply appearance-none bg-no-repeat pr-9;
@@ -64,10 +64,10 @@ body {
     background-position: right 0.65rem center;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-700;
+    @apply mb-2 block text-sm font-medium text-slate-700;
   }
   .hint {
-    @apply mt-1 block text-xs leading-relaxed text-slate-500;
+    @apply mt-1.5 block text-xs leading-relaxed text-slate-500;
   }
   .link {
     @apply font-medium text-neutral-950 underline decoration-neutral-300 underline-offset-2 hover:decoration-neutral-950;

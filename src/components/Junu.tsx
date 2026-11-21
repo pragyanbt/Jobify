@@ -372,7 +372,7 @@ export function JunuComposer() {
 
   return (
     <div className="sticky bottom-[calc(var(--tabbar-h)+0.75rem)] z-20 mt-6 md:bottom-5">
-      <div className="mx-auto max-w-4xl rounded-2xl border border-neutral-200 bg-white p-3 sm:p-4">
+      <div className="mx-auto max-w-4xl rounded-3xl border border-neutral-200 bg-white p-3.5 sm:p-4">
         {busy && (
           <button
             onClick={() => openJunu()}
@@ -677,8 +677,7 @@ function Composer({
         onClick={send}
         disabled={busy || !input.trim()}
         className={cx(
-          "grid size-9 shrink-0 place-items-center bg-brand-600 text-white transition hover:bg-brand-700 disabled:bg-slate-100 disabled:text-slate-400",
-          variant === "bar" ? "rounded-full" : "rounded-xl",
+          "grid size-9 shrink-0 place-items-center rounded-full bg-brand-600 text-white transition hover:bg-brand-700 disabled:bg-slate-100 disabled:text-slate-400",
         )}
         aria-label="Send"
       >
