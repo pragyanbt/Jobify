@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { assertCanUseAI, ForbiddenError } from "../auth";
 import { MODEL } from "../ai/client";
+import { recordUsage, tokensFromUsage } from "../ai/usage";
 import { junuTools, TOOL_LABELS, type JunuEffect } from "./tools";
 
 // Junu: Jobify's in-app assistant. A Messages API tool loop (the SDK's tool
@@ -57,6 +59,7 @@ export async function runJunu(
   // The API needs the conversation to start with a user turn.
   while (turns.length && turns[0].role !== "user") turns.shift();
   if (!turns.length || turns[turns.length - 1].role !== "user") throw new Error("Send a message first.");
+  await assertCanUseAI(user.id);
 
   // Per-turn context rides on the latest user message, so the cached system prompt never changes.
   const notes = [
@@ -91,8 +94,17 @@ export async function runJunu(
   );
 
   let last: Anthropic.Beta.BetaMessage | null = null;
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
   for await (const message of runner) {
     last = message;
+    const t = tokensFromUsage(message.usage);
+    inputTokens += t.inputTokens;
+    outputTokens += t.outputTokens;
+    cacheReadTokens += t.cacheReadTokens ?? 0;
+    cacheWriteTokens += t.cacheWriteTokens ?? 0;
     for (const block of message.content) {
       if (block.type === "text" && block.text.trim()) emit({ type: "text", text: block.text });
       if (block.type === "tool_use") emit({ type: "tool", name: block.name, label: TOOL_LABELS[block.name] ?? "Working" });
@@ -100,6 +112,12 @@ export async function runJunu(
     // A refusal can cut a tool call off mid-input: stop before any tool runs.
     if (message.stop_reason === "refusal" || message.stop_reason === "max_tokens") break;
   }
+  void recordUsage({
+    kind: "junu",
+    model: MODEL,
+    userId: user.id,
+    usage: { inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens },
+  });
 
   if (last?.stop_reason === "refusal") {
     emit({ type: "text", text: "Sorry, I can't help with that one. Is there something else about your job search I can do?" });
@@ -113,6 +131,7 @@ export async function runJunu(
 
 /** Map SDK failures to messages a user can act on. */
 export function junuErrorMessage(err: unknown): string {
+  if (err instanceof ForbiddenError) return err.message;
   if (err instanceof Anthropic.AuthenticationError) return "Junu can't reach Claude: the API key isn't valid. Check ANTHROPIC_API_KEY in .env.local.";
   if (err instanceof Anthropic.RateLimitError) return "Junu is getting too many requests right now. Try again in a moment.";
   if (err instanceof Anthropic.APIConnectionError) return "Junu couldn't connect to Claude. Check your internet connection and try again.";

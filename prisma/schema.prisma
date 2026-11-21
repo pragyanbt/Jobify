@@ -21,6 +21,11 @@ model Profile {
   id               String   @id
   email            String   @default("")
   name             String   @default("")
+  /// user | admin
+  role             String   @default("user")
+  /// pending (awaiting admin) | active | paused (no Claude calls) | banned
+  status           String   @default("pending")
+  approvedAt       DateTime?
   /// JSON: ProfileFact[] — atomic, user-approvable facts used as evidence.
   facts            String   @default("[]")
   /// JSON: TailoringRules
@@ -38,6 +43,28 @@ model Profile {
   selfId           String   @default("{}")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+/// One Claude API call (or one Junu tool-loop turn), for cost tracking.
+model ApiUsage {
+  id               String   @id @default(cuid())
+  userId           String
+  /// structured | junu
+  kind             String
+  model            String
+  inputTokens      Int      @default(0)
+  outputTokens     Int      @default(0)
+  cacheReadTokens  Int      @default(0)
+  cacheWriteTokens Int      @default(0)
+  /// Estimated USD for this call.
+  costUsd          Float    @default(0)
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
 
 /// A user-owned master resume. Tailoring NEVER writes to this row.

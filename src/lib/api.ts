@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { AIError } from "./ai/client";
-import { requireUser, UnauthorizedError, type SessionUser } from "./auth";
+import { ForbiddenError, requireAdmin, requireUser, UnauthorizedError, type SessionUser } from "./auth";
+import { runWithUser } from "./requestContext";
 
 export class NotFoundError extends Error {
   constructor(what = "Not found") {
@@ -16,6 +17,9 @@ export function handler<A extends unknown[]>(fn: (...args: A) => Promise<Respons
       return await fn(...args);
     } catch (e) {
       if (e instanceof UnauthorizedError) return NextResponse.json({ error: e.message }, { status: 401 });
+      if (e instanceof ForbiddenError) {
+        return NextResponse.json({ error: e.message, code: e.code }, { status: 403 });
+      }
       if (e instanceof NotFoundError) return NextResponse.json({ error: e.message }, { status: 404 });
       if (e instanceof ZodError) {
         return NextResponse.json({ error: "Invalid request", issues: e.issues }, { status: 400 });
@@ -31,9 +35,25 @@ export function handler<A extends unknown[]>(fn: (...args: A) => Promise<Respons
 
 export type Ctx<P extends Record<string, string>> = { params: Promise<P> };
 
-/** Route handler that requires a signed-in user and passes it in. */
+type AuthedOpts = { allowPending?: boolean; allowBanned?: boolean };
+
+/** Route handler that requires a signed-in (and usually approved) user. */
 export function authed<P extends Record<string, string> = Record<string, never>>(
   fn: (req: Request, user: SessionUser, ctx: Ctx<P>) => Promise<Response>,
+  opts: AuthedOpts = {},
 ) {
-  return handler(async (req: Request, ctx: Ctx<P>) => fn(req, await requireUser(), ctx));
+  return handler(async (req: Request, ctx: Ctx<P>) => {
+    const user = await requireUser(opts);
+    return runWithUser(user.id, () => fn(req, user, ctx));
+  });
+}
+
+/** Admin-only route. */
+export function admined<P extends Record<string, string> = Record<string, never>>(
+  fn: (req: Request, user: SessionUser, ctx: Ctx<P>) => Promise<Response>,
+) {
+  return handler(async (req: Request, ctx: Ctx<P>) => {
+    const user = await requireAdmin();
+    return runWithUser(user.id, () => fn(req, user, ctx));
+  });
 }

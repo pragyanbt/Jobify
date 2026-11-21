@@ -11,9 +11,10 @@ const URL = `postgresql://postgres:postgres@127.0.0.1:${PORT}/postgres?sslmode=d
 process.env.DATABASE_URL = URL;
 process.env.DIRECT_URL = URL;
 
-const session = { id: "user-a", email: "a@example.com" };
+const session = { id: "user-a", email: "a@example.com", role: "user" as const, status: "active" as const };
 vi.mock("@/lib/auth", () => ({
   UnauthorizedError: class extends Error {},
+  ForbiddenError: class extends Error { code = "forbidden"; },
   requireUser: async () => session,
 }));
 

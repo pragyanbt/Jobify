@@ -71,6 +71,10 @@ export function runJobSearch(userId: string): Promise<JobSearchStatus> {
 
 async function doRun(userId: string): Promise<JobSearchStatus> {
   const started = Date.now();
+  const masters = await prisma.masterResume.count({ where: { userId } });
+  if (masters === 0) {
+    throw new Error("Upload a master resume in Resume Studio before searching for jobs.");
+  }
   const { jobSearch: s, autoApply } = await getProfile(userId);
   if (s.keywords.length === 0) throw new Error("Add at least one target job title in Settings → Job search.");
 

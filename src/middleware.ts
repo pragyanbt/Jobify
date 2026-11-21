@@ -6,12 +6,16 @@ import { SUPABASE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 // out: pages redirect to /login, API routes get 401. Route handlers still
 // verify the user themselves (requireUser) — this is the first line only.
 
-const PUBLIC_PAGES = ["/login", "/auth"];
+const PUBLIC_PAGES = ["/login", "/auth", "/pending", "/blocked"];
 const PUBLIC_API = ["/api/discovery", "/api/health"];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  let response = NextResponse.next({ request });
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", path);
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     if (path.startsWith("/api/") || path === "/setup") return response;
@@ -23,7 +27,7 @@ export async function middleware(request: NextRequest) {
       getAll: () => request.cookies.getAll(),
       setAll: (toSet, headers) => {
         toSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = NextResponse.next({ request: { headers: requestHeaders } });
         toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         Object.entries(headers ?? {}).forEach(([k, v]) => response.headers.set(k, v));
       },
@@ -46,7 +50,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
   } else if (path === "/login" || path === "/") {
-    // Home is the landing page.
+    // Home is the landing page; layout will send pending/banned users elsewhere.
     return NextResponse.redirect(new URL("/home", request.url));
   }
   return response;

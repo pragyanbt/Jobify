@@ -7,7 +7,7 @@ import { IconChart, IconFile, IconHelp, IconHome, IconLogout, IconSend, IconSett
 import { ApplyPrompt } from "./ApplyPrompt";
 import { JunuAvatar } from "./JunuAvatar";
 import { Junu, openJunu } from "./Junu";
-import { cx, useClickOutside } from "./ui";
+import { cx, useClickOutside, Notice } from "./ui";
 
 const LINKS = [
   { href: "/home", label: "Home", short: "Home", icon: IconHome },
@@ -16,6 +16,8 @@ const LINKS = [
   { href: "/insights", label: "Insights", short: "Insights", icon: IconChart },
   { href: "/settings", label: "Settings", short: "Settings", icon: IconSettings },
 ];
+
+const ADMIN_LINK = { href: "/admin", label: "Dev dashboard", short: "Admin", icon: IconChart };
 
 function useActive() {
   const path = usePathname();
@@ -26,7 +28,17 @@ function useActive() {
 const COLLAPSE_KEY = "jobify.sidebar.collapsed";
 
 /** Signed-in chrome: sidebar on desktop; top bar + bottom tab bar on phones. */
-export function AppShell({ email, children }: { email: string | null; children: ReactNode }) {
+export function AppShell({
+  email,
+  children,
+  role = null,
+  paused = false,
+}: {
+  email: string | null;
+  children: ReactNode;
+  role?: string | null;
+  paused?: boolean;
+}) {
   const path = usePathname();
   const chat = path.startsWith("/chat");
   const [collapsed, setCollapsed] = useState(false);
@@ -41,9 +53,10 @@ export function AppShell({ email, children }: { email: string | null; children: 
   if (email === null) {
     return <main className="min-h-dvh">{children}</main>;
   }
+  const admin = role === "admin";
   return (
     <div className={cx("min-h-dvh transition-[padding] duration-200", collapsed ? "md:pl-[76px]" : "md:pl-64")}>
-      <Sidebar email={email} collapsed={collapsed} onToggle={toggle} />
+      <Sidebar email={email} collapsed={collapsed} onToggle={toggle} admin={admin} />
       <MobileTopBar email={email} />
       {chat ? (
         // Chat pages fill the space between the top bar and the tab bar (phones) or the window (desktop).
@@ -52,23 +65,31 @@ export function AppShell({ email, children }: { email: string | null; children: 
         </main>
       ) : (
         <main className="mx-auto w-full max-w-7xl px-4 pb-[calc(var(--tabbar-h)+2.5rem)] pt-5 sm:px-6 md:px-8 md:pb-14 md:pt-8">
+          {paused && (
+            <div className="mb-5">
+              <Notice tone="warning" title="Account paused">
+                AI features are turned off for this account. You can still browse and upload resumes.
+              </Notice>
+            </div>
+          )}
           {children}
         </main>
       )}
-      <BottomTabs />
+      <BottomTabs admin={admin} />
       <ApplyPrompt />
       <Junu />
     </div>
   );
 }
 
-function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boolean; onToggle: () => void }) {
+function Sidebar({ email, collapsed, onToggle, admin }: { email: string; collapsed: boolean; onToggle: () => void; admin: boolean }) {
   const active = useActive();
   const item = (on: boolean) => cx(
     "flex items-center gap-3 rounded-full text-[15px] transition",
     collapsed ? "size-11 justify-center" : "px-4 py-2.5",
     on ? "bg-white font-medium text-neutral-950 shadow-[0_1px_3px_rgba(15,23,42,0.08)]" : "font-medium text-neutral-600 hover:bg-white hover:text-neutral-950",
   );
+  const links = admin ? [...LINKS, ADMIN_LINK] : LINKS;
 
   return (
     <aside className={cx("fixed inset-y-0 left-0 z-30 hidden flex-col bg-[var(--app-bg)] py-6 transition-[width] duration-200 md:flex", collapsed ? "w-[76px] items-center px-2.5" : "w-64 px-4")}>
@@ -83,7 +104,7 @@ function Sidebar({ email, collapsed, onToggle }: { email: string; collapsed: boo
       </div>
 
       <nav className={cx("mt-8 flex flex-1 flex-col gap-1.5", collapsed && "items-center")}>
-        {LINKS.map((l) => {
+        {links.map((l) => {
           const on = active(l.href);
           const Icon = l.icon;
           return (
@@ -166,8 +187,10 @@ function MobileTopBar({ email }: { email: string }) {
   );
 }
 
-function BottomTabs() {
+function BottomTabs({ admin }: { admin: boolean }) {
   const active = useActive();
+  // Phones keep five primary tabs; admin opens from Settings or desktop sidebar.
+  void admin;
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="grid h-16 grid-cols-5">

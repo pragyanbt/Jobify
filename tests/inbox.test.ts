@@ -19,7 +19,11 @@ const { PORT } = vi.hoisted(() => {
 
 const triage = vi.fn();
 vi.mock("@/lib/ai/operations", () => ({ triageEmails: (...a: unknown[]) => triage(...a) }));
-vi.mock("@/lib/auth", () => ({ UnauthorizedError: class extends Error {}, requireUser: async () => ({ id: "u1", email: "a@x.com" }) }));
+vi.mock("@/lib/auth", () => ({
+  UnauthorizedError: class extends Error {},
+  ForbiddenError: class extends Error { code = "forbidden"; },
+  requireUser: async () => ({ id: "u1", email: "a@x.com", role: "user", status: "active" }),
+}));
 
 const b64 = (s: string) => Buffer.from(s).toString("base64url");
 function msg(id: string, from: string, subject: string, body: string): GmailMessage {

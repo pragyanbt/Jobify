@@ -21,6 +21,9 @@ Then sign up, and: **Resume Studio → Add master resume**, **Settings → Profi
 ### Accounts and data
 
 - Sign-in is Supabase Auth (email + password; Google optional via `NEXT_PUBLIC_AUTH_GOOGLE=true`).
+- New accounts stay **pending** until an admin approves them. Admins are listed in
+  `JOBIFY_ADMIN_EMAILS` (default `pragyan4044@gmail.com`) and get a **Dev dashboard** at `/admin`
+  to approve, pause (blocks Claude spend), or ban users and to review API cost.
 - Data lives in Supabase Postgres via Prisma. Every row is owned by a user and every query is scoped
   to the signed-in user (`src/lib/auth.ts`, `authed()` in `src/lib/api.ts`).
 - `prisma/rls.sql` enables row-level security with no policies and revokes API-role access, so

@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import type { z } from "zod";
+import { assertCanUseAI } from "../auth";
+import { currentUserId } from "../requestContext";
+import { recordUsage, tokensFromUsage } from "./usage";
 
 export const MODEL = process.env.JOBIFY_MODEL ?? "claude-opus-5-5";
 
@@ -25,6 +28,9 @@ export async function structured<S extends z.ZodType>(opts: {
   effort?: "low" | "medium" | "high" | "xhigh";
   maxTokens?: number;
 }): Promise<z.infer<S>> {
+  const userId = currentUserId();
+  if (userId) await assertCanUseAI(userId);
+
   try {
     const stream = getClient().beta.messages.stream({
       model: MODEL,
@@ -37,6 +43,7 @@ export async function structured<S extends z.ZodType>(opts: {
       messages: [{ role: "user", content: opts.user }],
     });
     const msg = await stream.finalMessage();
+    void recordUsage({ kind: "structured", model: MODEL, usage: tokensFromUsage(msg.usage), userId });
 
     if (msg.stop_reason === "refusal") {
       throw new AIError(

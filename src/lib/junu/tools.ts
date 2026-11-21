@@ -9,6 +9,7 @@ import { parseJson } from "../json";
 import { TAILOR_RUNNING } from "../jobs";
 import { fetchJobFromUrl, jobFromPastedText, ManualEntryNeeded } from "../jobsearch/fromUrl";
 import { getSearchStatus, runJobSearch } from "../jobsearch/run";
+import { runWithUser } from "../requestContext";
 import { startTailoring } from "../pipeline";
 import { getProfile, saveProfile } from "../profile";
 import { prepareApplication } from "../prepareApplication";
@@ -140,7 +141,7 @@ export function junuTools(userId: string, onEffect: (e: JunuEffect) => void, ema
     run: async () => {
       const before = await getSearchStatus(userId);
       if (before.running) return "A search is already running. New jobs will appear in the Jobs list shortly.";
-      void runJobSearch(userId).catch((e) => console.error("[junu] job search failed", e));
+      void runWithUser(userId, () => runJobSearch(userId)).catch((e) => console.error("[junu] job search failed", e));
       onEffect({ kind: "search", link: "/home" });
       const { jobSearch: s } = await getProfile(userId);
       return json({

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, buttonClass, Card, Empty, ErrorNote, Field, Notice, ScorePill, Segmented, Spinner, StatusBadge, Tabs } from "@/components/ui";
 import { IconBriefcase, IconClock, IconExternal, IconFile, IconLink, IconMapPin, IconPlus, IconSearch, IconSparkles, IconX } from "@/components/icons";
 import { ImportLocalBanner } from "@/components/ImportLocalBanner";
+import { OnboardingResume } from "@/components/OnboardingResume";
 import { topMatchesFrom, TopMatchesStrip } from "@/components/TopMatches";
 import { api, useApi } from "@/lib/fetcher";
 import { trackApply } from "@/lib/applyTracker";
@@ -152,7 +153,12 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
             <Button onClick={() => setOpen((o) => !o)}>
               {open ? <IconX /> : <IconPlus />} {open ? "Close" : "Add job"}
             </Button>
-            <Button variant="primary" onClick={searchNow} disabled={running}>
+            <Button
+              variant="primary"
+              onClick={searchNow}
+              disabled={running}
+              title="Searches need a master resume in Resume Studio"
+            >
               {running ? <Spinner /> : <IconSearch />} {running ? "Searching…" : "Find new jobs"}
             </Button>
           </div>
@@ -197,6 +203,7 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
         )}
       </div>
 
+      <OnboardingResume />
       {topSlot}
       <TopMatchesStrip matches={topMatches} />
       <ImportLocalBanner onImported={() => { void jobs.reload(); void search.reload(); }} />

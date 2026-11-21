@@ -50,10 +50,11 @@ function Login() {
         });
         if (error) throw error;
         if (data.session) {
-          window.location.assign(next);
+          // New accounts wait for admin approval before using the product.
+          window.location.assign("/pending");
           return;
         }
-        setInfo("Check your email for a confirmation link, then come back and sign in.");
+        setInfo("Check your email for a confirmation link. After that, an admin still needs to approve your account before you can sign in.");
         setMode("signin");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: callback("/auth/reset-password") });
@@ -79,7 +80,7 @@ function Login() {
   const title = { signin: "Welcome back", signup: "Create your account", reset: "Reset your password" }[mode];
   const subtitle = {
     signin: "Sign in to pick up where you left off.",
-    signup: "Your resumes, jobs and applications are saved to your account.",
+    signup: "Create an account — an admin will approve it before you can use Jobify.",
     reset: "We'll email you a link to choose a new password.",
   }[mode];
 

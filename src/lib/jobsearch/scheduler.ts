@@ -1,5 +1,6 @@
 import { prisma } from "../db";
 import { getProfile } from "../profile";
+import { runWithUser } from "../requestContext";
 import { getSearchStatus, runJobSearch } from "./run";
 
 // In-process scheduler: every 10 minutes, runs a search for each user whose
@@ -11,7 +12,8 @@ const g = globalThis as unknown as { jobifyScheduler?: NodeJS.Timeout };
 async function tick() {
   let users: { id: string }[];
   try {
-    users = await prisma.profile.findMany({ select: { id: true } });
+    // Only approved, non-paused accounts get scheduled searches.
+    users = await prisma.profile.findMany({ where: { status: "active" }, select: { id: true } });
   } catch (e) {
     console.error("[jobify] scheduler couldn't reach the database", (e as Error).message);
     return;
@@ -24,7 +26,7 @@ async function tick() {
       if (status.running) continue;
       const last = status.lastRunAt ? new Date(status.lastRunAt).getTime() : 0;
       if (Date.now() - last < jobSearch.intervalHours * 3_600_000) continue;
-      const r = await runJobSearch(id);
+      const r = await runWithUser(id, () => runJobSearch(id));
       console.log(`[jobify] scheduled job search for ${id.slice(0, 8)}…: ${r.added ?? 0} new job(s)`);
     } catch (e) {
       console.error("[jobify] scheduled job search failed", (e as Error).message);
