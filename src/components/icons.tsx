@@ -109,7 +109,7 @@ export const IconLink = (p: P) => (
   <svg {...base(p)}><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
 );
 
-/** Jobify app logo (public/logo.png). `tile` puts it on a white rounded square for dark/colored backgrounds. */
+/** Jobify app logo (public/logo.png). `tile` puts it on a white rounded square for dark backgrounds. */
 export function Logo({ size = 28, tile = false }: { size?: number; tile?: boolean }) {
   const img = <Image src="/logo.png" alt="Jobify" width={size} height={size} priority className="shrink-0 select-none" draggable={false} />;
   if (!tile) return img;

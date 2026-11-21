@@ -66,7 +66,7 @@ export function TopMatchesStrip({ matches }: { matches: TopMatch[] }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <div className="flex items-center gap-1.5 px-4 pb-2.5 text-sm font-semibold text-slate-800">
-        <IconStar className="size-3.5 fill-amber-400 text-amber-400" /> Top matches
+        <IconStar className="size-3.5" /> Top matches
         <span className="font-normal text-slate-500">· {matches.length} above {TOP_MATCH_MIN}%</span>
       </div>
       <ul className="no-scrollbar flex snap-x gap-2 overflow-x-auto px-4">

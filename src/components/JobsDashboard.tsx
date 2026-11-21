@@ -149,10 +149,10 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
             <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight text-slate-900 sm:text-[32px]">{headline}</h1>
           </div>
           <div className="flex shrink-0 gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
-            <Button onClick={() => setOpen((o) => !o)} className="rounded-full">
+            <Button onClick={() => setOpen((o) => !o)}>
               {open ? <IconX /> : <IconPlus />} {open ? "Close" : "Add job"}
             </Button>
-            <Button variant="primary" onClick={searchNow} disabled={running} className="rounded-full px-5">
+            <Button variant="primary" onClick={searchNow} disabled={running} className="px-4">
               {running ? <Spinner /> : <IconSearch />} {running ? "Searching…" : "Find new jobs"}
             </Button>
           </div>
@@ -189,7 +189,7 @@ export function JobsDashboard({ topSlot }: { topSlot?: React.ReactNode }) {
         )}
         {errors.length > 0 && !running && (
           <details className="w-full sm:w-auto">
-            <summary className="cursor-pointer font-medium text-amber-700">{errors.length} source(s) failed</summary>
+            <summary className="cursor-pointer font-medium text-neutral-950">{errors.length} source(s) failed</summary>
             <ul className="mt-1 space-y-0.5 [overflow-wrap:anywhere]">
               {errors.map((r) => <li key={r.source}>{r.source}: {r.error}</li>)}
             </ul>
@@ -366,12 +366,9 @@ function jobStage(j: JobRow): Exclude<View, "all"> {
   return "new";
 }
 
-const MARK_COLORS = ["bg-sky-100 text-sky-700", "bg-violet-100 text-violet-700", "bg-emerald-100 text-emerald-700", "bg-amber-100 text-amber-800", "bg-rose-100 text-rose-700", "bg-teal-100 text-teal-700"];
-
 function CompanyMark({ name }: { name: string }) {
-  const h = [...name].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
   return (
-    <span className={`grid size-10 shrink-0 place-items-center rounded-xl text-sm font-semibold ${MARK_COLORS[h % MARK_COLORS.length]}`}>
+    <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-neutral-200 bg-neutral-50 text-sm font-semibold text-neutral-800">
       {(name.trim()[0] ?? "?").toUpperCase()}
     </span>
   );

@@ -73,14 +73,14 @@ export default function SettingsPage() {
       <PageHeader
         title="Settings"
         description={tab === "autopilot" ? "Let Junu prepare applications for you." : "What to search for, and how your resume is tailored."}
-        actions={<div className="hidden items-center gap-3 sm:flex">{msg && !dirty && <span className="text-sm text-emerald-700">{msg}</span>}{saveButton}</div>}
+        actions={<div className="hidden items-center gap-3 sm:flex">{msg && !dirty && <span className="text-sm text-neutral-600">{msg}</span>}{saveButton}</div>}
       />
       <Tabs
         value={tab}
         onChange={(t) => { setTab(t); window.history.replaceState(null, "", t === "autopilot" ? "#autopilot" : "#job-search"); }}
         tabs={[
           { id: "search", label: "Job search" },
-          { id: "autopilot", label: <span className="flex items-center gap-1.5">Autopilot {p.autoApply.enabled && <span className="rounded-full bg-emerald-100 px-1.5 text-[11px] font-semibold text-emerald-700">On</span>}</span> },
+          { id: "autopilot", label: <span className="flex items-center gap-1.5">Autopilot {p.autoApply.enabled && <span className="rounded-full bg-neutral-950 px-1.5 text-[11px] font-medium text-white">On</span>}</span> },
         ]}
       />
       <ErrorNote error={err} />
@@ -174,7 +174,7 @@ export default function SettingsPage() {
             const upd = (patch: Partial<ProfileFact>) =>
               setP({ ...p, facts: p.facts.map((x, j) => (j === i ? { ...x, ...patch } : x)) });
             return (
-              <li key={f.id} className={`rounded-xl border p-3 ${f.approved ? "border-slate-200" : "border-amber-200 bg-amber-50/40"}`}>
+              <li key={f.id} className={`rounded-xl border p-3 ${f.approved ? "border-neutral-200" : "border-neutral-400 bg-neutral-50"}`}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <select className="input sm:w-40" value={f.category} onChange={(e) => upd({ category: e.target.value as FactCategory })}>
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                     <input type="checkbox" checked={f.approved} onChange={(e) => upd({ approved: e.target.checked })} /> Approved
                   </label>
                   {f.source === "extracted" && <Badge>extracted</Badge>}
-                  <button className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50" onClick={() => setP({ ...p, facts: p.facts.filter((_, j) => j !== i) })}>
+                  <button className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950" onClick={() => setP({ ...p, facts: p.facts.filter((_, j) => j !== i) })}>
                     <IconTrash className="size-3.5" /> Remove
                   </button>
                 </div>
@@ -293,7 +293,7 @@ export default function SettingsPage() {
       {(dirty || msg) && (
         <StickyActionBar className="sm:hidden">
           <div className="flex items-center gap-3 [&>button]:flex-1">
-            {msg && !dirty && <span className="text-sm text-emerald-700">{msg}</span>}
+            {msg && !dirty && <span className="text-sm text-neutral-600">{msg}</span>}
             {saveButton}
           </div>
         </StickyActionBar>
@@ -304,8 +304,8 @@ export default function SettingsPage() {
 
 function SysPill({ ok, label, value }: { ok: boolean; label: string; value: string }) {
   return (
-    <span className={`inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1 text-xs ${ok ? "border-slate-200 bg-white text-slate-600" : "border-red-200 bg-red-50 text-red-700"}`}>
-      <span className={`size-1.5 shrink-0 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`} />
+    <span className={`inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1 text-xs ${ok ? "border-neutral-200 bg-white text-neutral-600" : "border-neutral-950 bg-white text-neutral-950"}`}>
+      <span className={`size-1.5 shrink-0 rounded-full ${ok ? "bg-neutral-400" : "bg-neutral-950"}`} />
       <span className="font-medium text-slate-800">{label}</span>
       <span className="truncate">{value}</span>
     </span>

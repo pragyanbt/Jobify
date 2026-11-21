@@ -82,7 +82,7 @@ export default function ApplicationsPage() {
                 <div className="min-w-0">
                   <div className="truncate font-medium text-slate-900">{a.job.title}</div>
                   <div className="truncate text-sm text-slate-600">{a.job.company}</div>
-                  <div className="mt-1 text-xs text-amber-700">{a.reviewReason || "Pending approval"}</div>
+                  <div className="mt-1 text-xs text-neutral-600">{a.reviewReason || "Pending approval"}</div>
                 </div>
                 {a.version && (
                   <Link href={`/studio/tailored/${a.version.tailoredId}`} className={buttonClass("primary", "md", "w-full sm:w-auto")}>
@@ -158,8 +158,8 @@ export default function ApplicationsPage() {
 
 function MiniStat({ label, value, tone }: { label: string; value: number; tone?: "amber" }) {
   return (
-    <div className={`rounded-2xl border bg-white px-3 py-3 sm:px-4 ${tone === "amber" ? "border-amber-200" : "border-slate-200/80"}`}>
-      <div className={`text-2xl font-semibold tabular-nums ${tone === "amber" ? "text-amber-700" : "text-slate-900"}`}>{value}</div>
+    <div className={`rounded-xl border bg-white px-3 py-3 sm:px-4 ${tone === "amber" ? "border-neutral-950" : "border-neutral-200"}`}>
+      <div className="text-2xl font-semibold tabular-nums text-neutral-950">{value}</div>
       <div className="mt-0.5 text-xs leading-tight text-slate-500">{label}</div>
     </div>
   );

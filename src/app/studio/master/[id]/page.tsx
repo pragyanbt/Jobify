@@ -141,7 +141,7 @@ export default function MasterPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-amber-900/80">Tailoring treats this resume as the truth about your background, so fix anything inaccurate in the editor first.</p>
+          <p className="mt-2 text-xs text-neutral-600">Tailoring treats this resume as the truth about your background, so fix anything inaccurate in the editor first.</p>
         </Notice>
       )}
       {msg && <Notice tone="success">{msg}</Notice>}

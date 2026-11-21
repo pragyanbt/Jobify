@@ -2,9 +2,21 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { REFRESH_EVENT } from "@/lib/fetcher";
-import { IconArrowLeft, IconCheck, IconChevronDown, IconClock, IconSend } from "./icons";
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconChevronDown,
+  IconClock,
+  IconSend,
+} from "./icons";
 import { JunuAvatar } from "./JunuAvatar";
 import { cx, Spinner, Switch, useClickOutside } from "./ui";
 
@@ -55,7 +67,12 @@ interface JunuState {
 }
 
 const CONFIRM_KEY = "jobify.junu.confirmFirst";
-const INITIAL: JunuState = { msgs: [], busy: false, activity: null, confirmFirst: false };
+const INITIAL: JunuState = {
+  msgs: [],
+  busy: false,
+  activity: null,
+  confirmFirst: false,
+};
 let state = INITIAL;
 let loaded = false;
 const listeners = new Set<() => void>();
@@ -72,18 +89,31 @@ function ensureLoaded() {
   if (loaded) return;
   loaded = true;
   try {
-    state = { ...state, confirmFirst: localStorage.getItem(CONFIRM_KEY) === "1" };
-    const raw = JSON.parse(localStorage.getItem(STORE) ?? "null") as { msgs?: Msg[] } | null;
+    state = {
+      ...state,
+      confirmFirst: localStorage.getItem(CONFIRM_KEY) === "1",
+    };
+    const raw = JSON.parse(localStorage.getItem(STORE) ?? "null") as {
+      msgs?: Msg[];
+    } | null;
     if (raw && Array.isArray(raw.msgs)) {
-      state = { ...state, msgs: raw.msgs.filter((m) => m && typeof m.text === "string") };
+      state = {
+        ...state,
+        msgs: raw.msgs.filter((m) => m && typeof m.text === "string"),
+      };
       return;
     }
     // Earlier versions kept separate chats: merge them, oldest first, into the one history.
-    const v2 = JSON.parse(localStorage.getItem(V2_STORE) ?? "null") as { convos?: { updatedAt: number; msgs: Msg[] }[] } | null;
+    const v2 = JSON.parse(localStorage.getItem(V2_STORE) ?? "null") as {
+      convos?: { updatedAt: number; msgs: Msg[] }[];
+    } | null;
     const v1 = JSON.parse(localStorage.getItem(V1_STORE) ?? "[]") as Msg[];
     const merged = [
       ...(Array.isArray(v1) ? v1 : []),
-      ...(v2?.convos ?? []).slice().sort((a, b) => a.updatedAt - b.updatedAt).flatMap((c) => c.msgs ?? []),
+      ...(v2?.convos ?? [])
+        .slice()
+        .sort((a, b) => a.updatedAt - b.updatedAt)
+        .flatMap((c) => c.msgs ?? []),
     ].filter((m) => m && typeof m.text === "string" && !m.error);
     if (merged.length) {
       state = { ...state, msgs: merged.slice(-MAX_MSGS) };
@@ -98,7 +128,12 @@ function ensureLoaded() {
 
 function persist() {
   try {
-    localStorage.setItem(STORE, JSON.stringify({ msgs: state.msgs.filter((m) => !m.error).slice(-MAX_MSGS) }));
+    localStorage.setItem(
+      STORE,
+      JSON.stringify({
+        msgs: state.msgs.filter((m) => !m.error).slice(-MAX_MSGS),
+      }),
+    );
   } catch {
     /* storage unavailable: the chat just isn't remembered */
   }
@@ -111,11 +146,19 @@ function subscribe(l: () => void) {
 }
 
 function useJunu() {
-  return useSyncExternalStore(subscribe, () => state, () => INITIAL);
+  return useSyncExternalStore(
+    subscribe,
+    () => state,
+    () => INITIAL,
+  );
 }
 
 function setConfirmFirst(v: boolean) {
-  try { localStorage.setItem(CONFIRM_KEY, v ? "1" : "0"); } catch { /* storage unavailable */ }
+  try {
+    localStorage.setItem(CONFIRM_KEY, v ? "1" : "0");
+  } catch {
+    /* storage unavailable */
+  }
   setState({ confirmFirst: v });
 }
 
@@ -125,19 +168,28 @@ async function sendToJunu(text: string, page: string | null) {
 
   const user: Msg = { id: uid(), role: "user", text: content };
   const reply: Msg = { id: uid(), role: "assistant", text: "", tools: [] };
-  const kept = state.msgs.filter((m) => !m.error && m.text).slice(-(MAX_MSGS - 2));
+  const kept = state.msgs
+    .filter((m) => !m.error && m.text)
+    .slice(-(MAX_MSGS - 2));
   setState({ msgs: [...kept, user, reply], busy: true, activity: "Thinking" });
   // Junu sees the most recent part of the conversation.
   const context = [...kept, user].slice(-CONTEXT_TURNS);
 
   const patch = (fn: (m: Msg) => Msg, extra: Partial<JunuState> = {}) =>
-    setState({ msgs: state.msgs.map((m) => (m.id === reply.id ? fn(m) : m)), ...extra });
+    setState({
+      msgs: state.msgs.map((m) => (m.id === reply.id ? fn(m) : m)),
+      ...extra,
+    });
   let changed = false;
   try {
     const res = await fetch("/api/junu", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: context.map(({ role, text: c }) => ({ role, content: c })), page, confirmFirst: state.confirmFirst }),
+      body: JSON.stringify({
+        messages: context.map(({ role, text: c }) => ({ role, content: c })),
+        page,
+        confirmFirst: state.confirmFirst,
+      }),
     });
     if (!res.ok || !res.body) {
       const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -162,9 +214,17 @@ async function sendToJunu(text: string, page: string | null) {
           | { type: "done" }
           | { type: "error"; message: string };
         if (ev.type === "text") {
-          patch((m) => ({ ...m, text: m.text ? `${m.text}\n\n${ev.text}` : ev.text }), { activity: "Thinking" });
+          patch(
+            (m) => ({
+              ...m,
+              text: m.text ? `${m.text}\n\n${ev.text}` : ev.text,
+            }),
+            { activity: "Thinking" },
+          );
         } else if (ev.type === "tool") {
-          patch((m) => ({ ...m, tools: [...(m.tools ?? []), ev.label] }), { activity: ev.label });
+          patch((m) => ({ ...m, tools: [...(m.tools ?? []), ev.label] }), {
+            activity: ev.label,
+          });
         } else if (ev.type === "effect") {
           changed = true;
         } else if (ev.type === "error") {
@@ -173,7 +233,11 @@ async function sendToJunu(text: string, page: string | null) {
       }
     }
   } catch (e) {
-    patch((m) => ({ ...m, text: (e as Error).message || "Junu couldn't respond.", error: true }));
+    patch((m) => ({
+      ...m,
+      text: (e as Error).message || "Junu couldn't respond.",
+      error: true,
+    }));
   } finally {
     setState({ busy: false, activity: null });
     if (changed) window.dispatchEvent(new Event(REFRESH_EVENT));
@@ -216,12 +280,14 @@ export function Junu() {
   return (
     <button
       onClick={() => openJunu()}
-      className="fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full border border-brand-200 bg-white py-1.5 pl-1.5 pr-4 text-sm font-semibold text-brand-800 shadow-lg shadow-brand-900/10 transition hover:-translate-y-0.5 hover:shadow-xl md:flex"
+      className="fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full border border-neutral-200 bg-white py-1.5 pl-1.5 pr-4 text-sm font-medium text-neutral-950 shadow-sm md:flex"
       aria-label="Ask Junu"
     >
       <span className="relative">
         <JunuAvatar size={36} />
-        {busy && <span className="absolute -right-0.5 -top-0.5 size-2.5 animate-pulse rounded-full bg-brand-500 ring-2 ring-white" />}
+        {busy && (
+          <span className="absolute -right-0.5 -top-0.5 size-2.5 animate-pulse rounded-full bg-brand-500 ring-2 ring-white" />
+        )}
       </span>
       {busy ? "Junu is working…" : "Ask Junu"}
     </button>
@@ -238,7 +304,12 @@ function useBack() {
 
 function BackButton({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} className="grid size-10 shrink-0 place-items-center rounded-full text-slate-600 hover:bg-slate-100" aria-label="Back" title="Back">
+    <button
+      onClick={onClick}
+      className="grid size-10 shrink-0 place-items-center rounded-full text-slate-600 hover:bg-slate-100"
+      aria-label="Back"
+      title="Back"
+    >
       <IconArrowLeft className="size-5" />
     </button>
   );
@@ -246,7 +317,8 @@ function BackButton({ onClick }: { onClick: () => void }) {
 
 // ------------------------------------------------------------------ chat pages
 
-const PAGE_FRAME = "flex h-full min-h-0 flex-col bg-white md:overflow-hidden md:rounded-3xl md:border md:border-slate-200/80 md:shadow-[0_1px_2px_rgba(15,23,42,0.04)]";
+const PAGE_FRAME =
+  "flex h-full min-h-0 flex-col bg-white md:overflow-hidden md:rounded-2xl md:border md:border-neutral-200";
 
 /** /chat: the conversation with Junu, in the main area. */
 export function JunuChatPage() {
@@ -258,7 +330,12 @@ export function JunuChatPage() {
         <BackButton onClick={() => back()} />
         <JunuTitle busy={busy} activity={activity} />
       </header>
-      <Messages msgs={msgs} busy={busy} activity={activity} onSuggest={(t) => void sendToJunu(t, lastPage)} />
+      <Messages
+        msgs={msgs}
+        busy={busy}
+        activity={activity}
+        onSuggest={(t) => void sendToJunu(t, lastPage)}
+      />
       <Composer page={lastPage} autoFocus variant="panel" />
     </div>
   );
@@ -268,7 +345,10 @@ export function JunuChatPage() {
 
 const QUICK = [
   { label: "Find new jobs", prompt: "Find new jobs for me" },
-  { label: "Tailor for my best match", prompt: "Tailor my resume for my best match" },
+  {
+    label: "Tailor for my best match",
+    prompt: "Tailor my resume for my best match",
+  },
 ];
 const MORE_IDEAS = [
   "Prepare my application for my best match",
@@ -283,16 +363,23 @@ export function JunuComposer() {
   const { busy, activity, msgs, confirmFirst } = useJunu();
   const [more, setMore] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
-  const ask = (prompt: string) => { setMore(false); openJunu({ prompt }); };
+  const ask = (prompt: string) => {
+    setMore(false);
+    openJunu({ prompt });
+  };
 
   useClickOutside(moreRef, more, () => setMore(false));
 
   return (
     <div className="sticky bottom-[calc(var(--tabbar-h)+0.75rem)] z-20 mt-6 md:bottom-5">
-      <div className="mx-auto max-w-4xl rounded-3xl border border-slate-200/90 bg-white/95 p-3 shadow-[0_8px_30px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-neutral-300 bg-white p-3 shadow-[0_12px_40px_rgba(15,23,42,0.18)] sm:p-4">
         {busy && (
-          <button onClick={() => openJunu()} className="mb-2 flex items-center gap-1.5 px-1 text-xs font-medium text-brand-700">
-            <Spinner className="size-3" /> Junu: {activity ?? "Working"}… <span className="underline">View</span>
+          <button
+            onClick={() => openJunu()}
+            className="mb-2 flex items-center gap-1.5 px-1 text-xs font-medium text-brand-700"
+          >
+            <Spinner className="size-3" /> Junu: {activity ?? "Working"}…{" "}
+            <span className="underline">View</span>
           </button>
         )}
         <Composer page="/home" variant="bar" />
@@ -302,34 +389,69 @@ export function JunuComposer() {
             checked={confirmFirst}
             onChange={setConfirmFirst}
             title="Junu describes changes and waits for your OK"
-            label={<><span className="hidden sm:inline">Ask before acting</span><span className="sm:hidden">Ask first</span></>}
+            label={
+              <>
+                <span className="hidden sm:inline">Ask before acting</span>
+                <span className="sm:hidden">Ask first</span>
+              </>
+            }
           />
           <span className="hidden h-5 w-px bg-slate-200 sm:block" />
           <div className="flex min-w-0 flex-1 items-center gap-2">
             {QUICK.map((q) => (
-              <button key={q.label} onClick={() => ask(q.prompt)} disabled={busy} className="hidden shrink-0 rounded-full border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-slate-700 transition hover:border-brand-300 hover:bg-brand-50/50 disabled:opacity-50 sm:block">
+              <button
+                key={q.label}
+                onClick={() => ask(q.prompt)}
+                disabled={busy}
+                className="hidden shrink-0 rounded-full border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-slate-700 transition hover:border-brand-300 hover:bg-brand-50/50 disabled:opacity-50 sm:block"
+              >
                 {q.label}
               </button>
             ))}
             <div ref={moreRef} className="relative shrink-0">
-              <button onClick={() => setMore((m) => !m)} disabled={busy} className="flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-slate-700 transition hover:border-brand-300 disabled:opacity-50" aria-expanded={more}>
-                <span className="sm:hidden">Ideas</span><span className="hidden sm:inline">More ideas</span> <IconChevronDown className="size-3.5" />
+              <button
+                onClick={() => setMore((m) => !m)}
+                disabled={busy}
+                className="flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-slate-700 transition hover:border-brand-300 disabled:opacity-50"
+                aria-expanded={more}
+              >
+                <span className="sm:hidden">Ideas</span>
+                <span className="hidden sm:inline">More ideas</span>{" "}
+                <IconChevronDown className="size-3.5" />
               </button>
               {more && (
                 <div className="absolute bottom-full left-0 z-30 mb-2 w-[min(20rem,calc(100vw-3rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-xl">
-                  {[...QUICK.map((q) => q.prompt), ...MORE_IDEAS].map((p, i) => (
-                    <button key={p} onClick={() => ask(p)} className={cx("block w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-brand-50/60", i < QUICK.length && "sm:hidden")}>
-                      {p}
-                    </button>
-                  ))}
+                  {[...QUICK.map((q) => q.prompt), ...MORE_IDEAS].map(
+                    (p, i) => (
+                      <button
+                        key={p}
+                        onClick={() => ask(p)}
+                        className={cx(
+                          "block w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-brand-50/60",
+                          i < QUICK.length && "sm:hidden",
+                        )}
+                      >
+                        {p}
+                      </button>
+                    ),
+                  )}
                 </div>
               )}
             </div>
           </div>
-          <button onClick={() => openJunu()} className="flex shrink-0 items-center gap-1.5 rounded-full px-2 py-1.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-100" aria-label="Chat history">
+          <button
+            onClick={() => openJunu()}
+            className="flex shrink-0 items-center gap-1.5 rounded-full px-2 py-1.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-100"
+            aria-label="Chat history"
+          >
             <IconClock className="size-4" />
             <span className="hidden sm:inline">Chat history</span>
-            {msgs.length > 0 && <span className="size-1.5 rounded-full bg-brand-500" aria-label="Has messages" />}
+            {msgs.length > 0 && (
+              <span
+                className="size-1.5 rounded-full bg-brand-500"
+                aria-label="Has messages"
+              />
+            )}
           </button>
         </div>
       </div>
@@ -339,7 +461,13 @@ export function JunuComposer() {
 
 // ------------------------------------------------------------------ pieces
 
-function JunuTitle({ busy, activity }: { busy: boolean; activity: string | null }) {
+function JunuTitle({
+  busy,
+  activity,
+}: {
+  busy: boolean;
+  activity: string | null;
+}) {
   return (
     <>
       <JunuAvatar size={40} className="self-center" />
@@ -347,9 +475,15 @@ function JunuTitle({ busy, activity }: { busy: boolean; activity: string | null 
         <div className="font-semibold leading-tight text-slate-900">Junu</div>
         <div className="flex items-center gap-1.5 truncate text-xs text-slate-500">
           {busy ? (
-            <><Spinner className="size-3 text-brand-600" /> {activity ?? "Working"}…</>
+            <>
+              <Spinner className="size-3 text-brand-600" />{" "}
+              {activity ?? "Working"}…
+            </>
           ) : (
-            <><span className="size-1.5 rounded-full bg-emerald-500" /> Your job search assistant</>
+            <>
+              <span className="size-1.5 rounded-full bg-neutral-950" /> Your job
+              search assistant
+            </>
           )}
         </div>
       </div>
@@ -357,7 +491,12 @@ function JunuTitle({ busy, activity }: { busy: boolean; activity: string | null 
   );
 }
 
-function Messages({ msgs, busy, activity, onSuggest }: {
+function Messages({
+  msgs,
+  busy,
+  activity,
+  onSuggest,
+}: {
   msgs: Msg[];
   busy: boolean;
   activity: string | null;
@@ -370,13 +509,19 @@ function Messages({ msgs, busy, activity, onSuggest }: {
   }, [msgs, activity]);
 
   return (
-    <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5">
+    <div
+      ref={listRef}
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5"
+    >
       {msgs.length === 0 ? (
         <div className="flex min-h-full flex-col items-center justify-center text-center">
           <JunuAvatar size={128} full />
-          <h2 className="mt-4 text-xl font-semibold tracking-tight">Hi, I&apos;m Junu</h2>
+          <h2 className="mt-4 text-xl font-semibold tracking-tight">
+            Hi, I&apos;m Junu
+          </h2>
           <p className="mt-1 max-w-sm text-sm leading-relaxed text-slate-500">
-            I can find jobs, tailor your resume, prepare applications, and keep your applications up to date.
+            I can find jobs, tailor your resume, prepare applications, and keep
+            your applications up to date.
           </p>
           <div className="mt-6 grid w-full max-w-sm gap-2">
             {SUGGESTIONS.map((s) => (
@@ -406,10 +551,21 @@ function Messages({ msgs, busy, activity, onSuggest }: {
                   {m.tools && m.tools.length > 0 && (
                     <ul className="space-y-1">
                       {m.tools.map((t, k) => {
-                        const running = busy && i === msgs.length - 1 && k === m.tools!.length - 1 && activity === t;
+                        const running =
+                          busy &&
+                          i === msgs.length - 1 &&
+                          k === m.tools!.length - 1 &&
+                          activity === t;
                         return (
-                          <li key={k} className="flex items-center gap-1.5 text-xs text-slate-500">
-                            {running ? <Spinner className="size-3 text-brand-600" /> : <IconCheck className="size-3.5 text-emerald-600" />}
+                          <li
+                            key={k}
+                            className="flex items-center gap-1.5 text-xs text-slate-500"
+                          >
+                            {running ? (
+                              <Spinner className="size-3 text-neutral-950" />
+                            ) : (
+                              <IconCheck className="size-3.5 text-neutral-950" />
+                            )}
                             {t}
                           </li>
                         );
@@ -417,15 +573,25 @@ function Messages({ msgs, busy, activity, onSuggest }: {
                     </ul>
                   )}
                   {m.text ? (
-                    <div className={cx(
-                      "w-fit max-w-full rounded-2xl rounded-tl-md px-3.5 py-2.5 text-[15px] leading-relaxed [overflow-wrap:anywhere] md:text-sm",
-                      m.error ? "border border-red-200 bg-red-50 text-red-800" : "bg-slate-100 text-slate-800",
-                    )}>
+                    <div
+                      className={cx(
+                        "w-fit max-w-full rounded-2xl rounded-tl-md px-3.5 py-2.5 text-[15px] leading-relaxed [overflow-wrap:anywhere] md:text-sm",
+                        m.error
+                          ? "border border-neutral-950 bg-white text-neutral-950"
+                          : "bg-neutral-100 text-neutral-800",
+                      )}
+                    >
                       <Markdown text={m.text} />
                     </div>
                   ) : busy && i === msgs.length - 1 && !m.tools?.length ? (
                     <div className="inline-flex gap-1 rounded-2xl rounded-tl-md bg-slate-100 px-4 py-3.5">
-                      {[0, 150, 300].map((d) => <span key={d} className="size-1.5 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: `${d}ms` }} />)}
+                      {[0, 150, 300].map((d) => (
+                        <span
+                          key={d}
+                          className="size-1.5 animate-bounce rounded-full bg-slate-400"
+                          style={{ animationDelay: `${d}ms` }}
+                        />
+                      ))}
                     </div>
                   ) : null}
                 </div>
@@ -439,7 +605,15 @@ function Messages({ msgs, busy, activity, onSuggest }: {
 }
 
 /** Message input. In the panel it sends in place; on Home it sends and opens the chat. */
-function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus?: boolean; variant: "panel" | "bar" }) {
+function Composer({
+  page,
+  autoFocus,
+  variant,
+}: {
+  page: string | null;
+  autoFocus?: boolean;
+  variant: "panel" | "bar";
+}) {
   const { busy } = useJunu();
   const [input, setInput] = useState("");
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -452,7 +626,10 @@ function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus
     const el = ref.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, variant === "bar" ? 120 : 160)}px`;
+    el.style.height = `${Math.min(
+      el.scrollHeight,
+      variant === "bar" ? 120 : 160,
+    )}px`;
   }, [input, variant]);
 
   const send = () => {
@@ -464,12 +641,14 @@ function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus
   };
 
   const box = (
-    <div className={cx(
-      "flex items-end gap-2.5 transition",
-      variant === "bar"
-        ? "px-1"
-        : "rounded-2xl border border-slate-300 bg-white py-1.5 pl-3.5 pr-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15",
-    )}>
+    <div
+      className={cx(
+        "flex items-end gap-2.5 transition",
+        variant === "bar"
+          ? "px-1"
+          : "rounded-2xl border border-slate-300 bg-white py-1.5 pl-3.5 pr-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15",
+      )}
+    >
       {variant === "bar" && <JunuAvatar size={34} className="mb-0.5" />}
       <textarea
         ref={ref}
@@ -477,13 +656,21 @@ function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && isDesktop()) {
+          if (
+            e.key === "Enter" &&
+            !e.shiftKey &&
+            !e.nativeEvent.isComposing &&
+            isDesktop()
+          ) {
             e.preventDefault();
             send();
           }
         }}
         placeholder={variant === "bar" ? "Ask Junu anything…" : "Message Junu…"}
-        className={cx("max-h-40 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-slate-400", variant === "bar" ? "md:text-[15px]" : "md:text-sm")}
+        className={cx(
+          "max-h-40 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-slate-400",
+          variant === "bar" ? "md:text-[15px]" : "md:text-sm",
+        )}
       />
       <button
         type="button"
@@ -495,7 +682,11 @@ function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus
         )}
         aria-label="Send"
       >
-        {busy ? <Spinner className="size-4" /> : <IconSend className="size-4" />}
+        {busy ? (
+          <Spinner className="size-4" />
+        ) : (
+          <IconSend className="size-4" />
+        )}
       </button>
     </div>
   );
@@ -504,7 +695,10 @@ function Composer({ page, autoFocus, variant }: { page: string | null; autoFocus
   return (
     <div className="border-t border-slate-100 bg-white px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
       {box}
-      <p className="mt-1.5 text-center text-[11px] text-slate-400">Junu can make mistakes. Review tailored resumes and answers before you use them.</p>
+      <p className="mt-1.5 text-center text-[11px] text-slate-400">
+        Junu can make mistakes. Review tailored resumes and answers before you
+        use them.
+      </p>
     </div>
   );
 }
@@ -520,8 +714,17 @@ function Markdown({ text }: { text: string }) {
     if (!list) return;
     const Tag = list.ordered ? "ol" : "ul";
     blocks.push(
-      <Tag key={blocks.length} className={cx("space-y-1 pl-5", list.ordered ? "list-decimal" : "list-disc", "marker:text-slate-400")}>
-        {list.items.map((it, i) => <li key={i}>{inline(it)}</li>)}
+      <Tag
+        key={blocks.length}
+        className={cx(
+          "space-y-1 pl-5",
+          list.ordered ? "list-decimal" : "list-disc",
+          "marker:text-slate-400",
+        )}
+      >
+        {list.items.map((it, i) => (
+          <li key={i}>{inline(it)}</li>
+        ))}
       </Tag>,
     );
     list = null;
@@ -541,7 +744,9 @@ function Markdown({ text }: { text: string }) {
     if (!line.trim()) continue;
     const heading = line.match(/^#{1,6}\s+(.*)$/);
     blocks.push(
-      <p key={blocks.length} className={heading ? "font-semibold" : undefined}>{inline(heading ? heading[1] : line)}</p>,
+      <p key={blocks.length} className={heading ? "font-semibold" : undefined}>
+        {inline(heading ? heading[1] : line)}
+      </p>,
     );
   }
   flush();
@@ -559,16 +764,42 @@ function inline(s: string): ReactNode[] {
     if (m[1] !== undefined) {
       const href = m[2];
       if (/^\/(?!\/)/.test(href)) {
-        out.push(<Link key={k} href={href} className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:decoration-brand-600">{m[1]}</Link>);
+        out.push(
+          <Link
+            key={k}
+            href={href}
+            className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:decoration-brand-600"
+          >
+            {m[1]}
+          </Link>,
+        );
       } else if (/^https?:\/\//i.test(href)) {
-        out.push(<a key={k} href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2">{m[1]}</a>);
+        out.push(
+          <a
+            key={k}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2"
+          >
+            {m[1]}
+          </a>,
+        );
       } else {
         out.push(m[1]);
       }
     } else if (m[3] !== undefined) {
-      out.push(<strong key={k} className="font-semibold text-slate-900">{m[3]}</strong>);
+      out.push(
+        <strong key={k} className="font-semibold text-slate-900">
+          {m[3]}
+        </strong>,
+      );
     } else {
-      out.push(<code key={k} className="rounded bg-white/70 px-1 text-[0.9em]">{m[4]}</code>);
+      out.push(
+        <code key={k} className="rounded bg-white/70 px-1 text-[0.9em]">
+          {m[4]}
+        </code>,
+      );
     }
     last = re.lastIndex;
   }

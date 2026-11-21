@@ -159,9 +159,9 @@ export default function ApplicationPage() {
       <ErrorNote error={err} />
 
       <div className="grid grid-cols-3 gap-3">
-        <Count n={counts.ready} label="Ready" tone="text-emerald-700" />
-        <Count n={counts.drafted} label="Drafted · review" tone="text-brand-700" />
-        <Count n={counts.needs} label="Need you" tone={counts.needs ? "text-amber-700" : "text-slate-900"} />
+        <Count n={counts.ready} label="Ready" tone="text-neutral-950" />
+        <Count n={counts.drafted} label="Drafted · review" tone="text-neutral-950" />
+        <Count n={counts.needs} label="Need you" tone="text-neutral-950" />
       </div>
 
       {draft.formSource === "standard" && (
@@ -207,7 +207,7 @@ export default function ApplicationPage() {
                   <li key={q.id} className="space-y-2 px-4 py-4 sm:px-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 text-sm font-medium text-slate-800">
-                        {q.label}{q.required && <span className="text-red-500"> *</span>}
+                        {q.label}{q.required && <span className="text-neutral-950"> *</span>}
                       </div>
                       <Badge tone={src.tone}>{src.label}</Badge>
                     </div>
@@ -233,7 +233,7 @@ export default function ApplicationPage() {
 
       <StickyActionBar className="sm:static sm:rounded-2xl sm:border sm:p-4">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          {requiredMissing > 0 && <p className="text-xs text-amber-700 sm:mr-auto">{requiredMissing} required answer(s) still empty.</p>}
+          {requiredMissing > 0 && <p className="text-xs text-neutral-700 sm:mr-auto">{requiredMissing} required answer(s) still empty.</p>}
           <div className="grid grid-cols-2 gap-2 sm:ml-auto sm:flex">
             <Button onClick={prepare} disabled={!!busy} title="Ask Junu to fill in the form again">
               {busy === "prepare" ? <Spinner /> : <IconRefresh />} Redo

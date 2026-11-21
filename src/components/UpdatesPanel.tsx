@@ -28,15 +28,15 @@ interface Integrations {
   google: { configured: boolean; connected: boolean; lastSyncAt?: string | null; lastError?: string | null };
 }
 
-const KIND: Record<string, { label: string; emoji: string; tone: string }> = {
-  interview: { label: "Interview request", emoji: "🎉", tone: "bg-emerald-50 text-emerald-700" },
-  offer: { label: "Offer", emoji: "🏆", tone: "bg-emerald-50 text-emerald-700" },
-  assessment: { label: "Assessment", emoji: "📝", tone: "bg-brand-50 text-brand-700" },
-  recruiter: { label: "Recruiter message", emoji: "💬", tone: "bg-brand-50 text-brand-700" },
-  viewed: { label: "Application viewed", emoji: "👀", tone: "bg-sky-50 text-sky-700" },
-  application_received: { label: "Application received", emoji: "✉️", tone: "bg-slate-100 text-slate-600" },
-  rejection: { label: "Not moving forward", emoji: "🌧️", tone: "bg-slate-100 text-slate-600" },
-  other: { label: "Update", emoji: "📌", tone: "bg-slate-100 text-slate-600" },
+const KIND: Record<string, { label: string; mark: string }> = {
+  interview: { label: "Interview request", mark: "In" },
+  offer: { label: "Offer", mark: "Of" },
+  assessment: { label: "Assessment", mark: "As" },
+  recruiter: { label: "Recruiter message", mark: "Re" },
+  viewed: { label: "Application viewed", mark: "Vi" },
+  application_received: { label: "Application received", mark: "Ap" },
+  rejection: { label: "Not moving forward", mark: "No" },
+  other: { label: "Update", mark: "Up" },
 };
 const OUTCOME_LABEL: Record<string, string> = { interview: "Interview", offer: "Offer", rejected: "Rejected" };
 const REPLYABLE = new Set(["interview", "offer", "assessment", "recruiter"]);
@@ -84,7 +84,7 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
   const shown = compact && !showAll ? list.slice(0, 3) : list;
 
   return (
-    <section className="flex min-h-0 flex-col rounded-3xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <section className="flex min-h-0 flex-col rounded-xl border border-neutral-200 bg-white">
       <div className="flex items-center gap-2 px-5 pb-2 pt-4">
         <h2 className="flex-1 text-[17px] font-semibold text-slate-900">
           Updates {fresh > 0 && <span className="ml-1 rounded-full bg-brand-600 px-1.5 py-0.5 align-middle text-[11px] font-semibold text-white">{fresh} new</span>}
@@ -102,8 +102,8 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3 pt-2">
-        {err && <p className="mx-2 mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{err}</p>}
-        {connected && g?.lastError && !err && <p className="mx-2 mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{g.lastError}</p>}
+        {err && <p className="mx-2 mb-2 rounded-lg border border-neutral-950 px-3 py-2 text-xs text-neutral-950">{err}</p>}
+        {connected && g?.lastError && !err && <p className="mx-2 mb-2 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-xs text-neutral-800">{g.lastError}</p>}
 
         {!integ.data ? (
           <div className="space-y-2 p-2">{[0, 1].map((i) => <div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-100" />)}</div>
@@ -127,7 +127,7 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
               return (
                 <li key={u.id} className="group relative rounded-2xl px-3 py-3 transition hover:bg-slate-50">
                   <div className="flex gap-3">
-                    <span className={cx("grid size-11 shrink-0 place-items-center rounded-xl text-lg", k.tone)} aria-hidden>{k.emoji}</span>
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-neutral-100 text-[11px] font-semibold tracking-wide text-neutral-700" aria-hidden>{k.mark}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 pr-6">
                         {u.status === "new" && <span className="size-2 shrink-0 rounded-full bg-brand-600" aria-label="New" />}
@@ -141,7 +141,7 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
                       {u.summary && <p className="mt-1.5 line-clamp-3 text-sm leading-snug text-slate-600">{u.summary}</p>}
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {done ? (
-                          <span className="flex items-center gap-1 text-xs font-medium text-emerald-700"><IconCheck className="size-3.5" /> Recorded</span>
+                          <span className="flex items-center gap-1 text-xs font-medium text-neutral-700"><IconCheck className="size-3.5" /> Recorded</span>
                         ) : u.jobId && u.suggestedOutcome ? (
                           <button onClick={() => act(u, "record_outcome")} disabled={busy} className={buttonClass("primary", "sm")}>
                             {busy && <Spinner className="size-3" />} Mark as {OUTCOME_LABEL[u.suggestedOutcome] ?? u.suggestedOutcome}

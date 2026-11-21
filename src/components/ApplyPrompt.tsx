@@ -93,7 +93,7 @@ export function ApplyPrompt() {
               <b className="font-medium text-slate-900">{current.company}</b>. If you submitted it, we&apos;ll move it to Applied
               so you can track the outcome.
             </p>
-            {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+            {error && <p className="mt-3 rounded-lg border border-neutral-950 px-3 py-2 text-sm text-neutral-950">{error}</p>}
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               <Button variant="primary" className="h-11 sm:order-last sm:h-10" onClick={yes} disabled={busy} autoFocus>
                 {busy ? <Spinner /> : <IconCheck />} Yes, I applied
@@ -108,7 +108,7 @@ export function ApplyPrompt() {
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--tabbar-h)+1.5rem)] z-50 flex justify-center px-4 md:bottom-6">
           <div className="flex max-w-full items-center gap-2 rounded-full bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg">
-            <IconCheck className="size-4 shrink-0 text-emerald-400" />
+            <IconCheck className="size-4 shrink-0" />
             <span className="truncate">{toast}</span>
           </div>
         </div>

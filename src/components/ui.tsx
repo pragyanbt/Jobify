@@ -47,7 +47,7 @@ export function Card({ title, description, actions, children, className = "", pa
   padded?: boolean;
 }) {
   return (
-    <section className={cx("rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]", className)}>
+    <section className={cx("rounded-xl border border-neutral-200 bg-white", className)}>
       {(title || actions) && (
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3.5 sm:px-5">
           <div className="min-w-0">
@@ -65,10 +65,10 @@ export function Card({ title, description, actions, children, className = "", pa
 // ------------------------------------------------------------------ buttons
 
 const VARIANTS = {
-  primary: "bg-brand-600 text-white shadow-sm shadow-brand-900/10 hover:bg-brand-700 disabled:bg-brand-300 disabled:shadow-none",
-  secondary: "border border-slate-300 bg-white text-slate-700 shadow-[0_1px_1px_rgba(15,23,42,0.04)] hover:bg-slate-50 hover:text-slate-900 disabled:text-slate-400 disabled:hover:bg-white",
-  danger: "border border-red-200 bg-white text-red-700 hover:bg-red-50",
-  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+  primary: "bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-300",
+  secondary: "border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-50 hover:text-neutral-950 disabled:text-neutral-400 disabled:hover:bg-white",
+  danger: "border border-neutral-300 bg-white text-neutral-950 hover:bg-neutral-100",
+  ghost: "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950",
 };
 const SIZES = {
   md: "h-10 px-4 text-sm sm:h-9 sm:px-3.5",
@@ -100,11 +100,11 @@ export function Spinner({ className = "" }: { className?: string }) {
 // ------------------------------------------------------------------ badges & status
 
 const TONES = {
-  slate: "bg-slate-100 text-slate-700 ring-slate-200/70",
-  green: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  amber: "bg-amber-50 text-amber-800 ring-amber-200",
-  red: "bg-red-50 text-red-700 ring-red-200",
-  indigo: "bg-brand-50 text-brand-700 ring-brand-200",
+  slate: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+  green: "bg-neutral-950 text-white ring-neutral-950",
+  amber: "bg-neutral-100 text-neutral-950 ring-neutral-300",
+  red: "bg-white text-neutral-950 ring-neutral-950",
+  indigo: "bg-neutral-100 text-neutral-800 ring-neutral-200",
 };
 type Tone = keyof typeof TONES;
 
@@ -147,7 +147,7 @@ export function StatusBadge({ status }: { status: string }) {
 /** A small circular score, color-coded. */
 export function ScorePill({ score, from }: { score: number; from?: number }) {
   const s = Math.round(score);
-  const tone = s >= 70 ? "text-emerald-700 bg-emerald-50 ring-emerald-200" : s >= 45 ? "text-amber-800 bg-amber-50 ring-amber-200" : "text-slate-600 bg-slate-100 ring-slate-200";
+  const tone = s >= 70 ? "text-neutral-950 bg-neutral-100 ring-neutral-300" : s >= 45 ? "text-neutral-700 bg-white ring-neutral-200" : "text-neutral-500 bg-neutral-50 ring-neutral-200";
   return (
     <span className="inline-flex items-center gap-1 text-xs tabular-nums">
       {from != null && <span className="text-slate-400">{Math.round(from)}% →</span>}
@@ -176,11 +176,11 @@ export function ScoreBar({ label, score, muted }: { label: string; score: number
 // ------------------------------------------------------------------ feedback
 
 const NOTICE = {
-  info: { box: "border-brand-200 bg-brand-50/70 text-brand-900", icon: IconInfo },
-  success: { box: "border-emerald-200 bg-emerald-50 text-emerald-900", icon: IconCheck },
-  warning: { box: "border-amber-200 bg-amber-50 text-amber-900", icon: IconAlert },
-  error: { box: "border-red-200 bg-red-50 text-red-800", icon: IconAlert },
-  neutral: { box: "border-slate-200 bg-slate-50 text-slate-700", icon: IconInfo },
+  info: { box: "border-neutral-200 bg-neutral-50 text-neutral-800", icon: IconInfo },
+  success: { box: "border-neutral-200 bg-white text-neutral-950", icon: IconCheck },
+  warning: { box: "border-neutral-300 bg-neutral-50 text-neutral-950", icon: IconAlert },
+  error: { box: "border-neutral-950 bg-white text-neutral-950", icon: IconAlert },
+  neutral: { box: "border-neutral-200 bg-neutral-50 text-neutral-700", icon: IconInfo },
 };
 
 export function Notice({ tone = "info", title, children, action }: {
@@ -332,7 +332,7 @@ export function Field({ label, hint, children, className = "" }: { label: ReactN
 
 export function Stat({ label, value, icon }: { label: string; value: ReactNode; icon?: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <div className="rounded-xl border border-neutral-200 bg-white p-4">
       <div className="flex items-center justify-between text-xs font-medium text-slate-500">
         {label}
         {icon && <span className="text-slate-400 [&_svg]:size-4">{icon}</span>}

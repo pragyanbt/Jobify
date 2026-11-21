@@ -142,9 +142,9 @@ function Workflow({ steps, collapsed }: { steps: PipelineStep[]; collapsed: bool
   useEffect(() => setOpen(!collapsed), [collapsed]);
   const done = steps.filter((s) => s.status === "done").length;
   const dot = (st: PipelineStep["status"]) => {
-    if (st === "done") return <span className="grid size-5 place-items-center rounded-full bg-emerald-500 text-white"><IconCheck className="size-3" strokeWidth={3} /></span>;
+    if (st === "done") return <span className="grid size-5 place-items-center rounded-full bg-neutral-950 text-white"><IconCheck className="size-3" strokeWidth={3} /></span>;
     if (st === "running") return <Spinner className="size-5 text-brand-600" />;
-    if (st === "error") return <span className="grid size-5 place-items-center rounded-full bg-red-500 text-white"><IconX className="size-3" strokeWidth={3} /></span>;
+    if (st === "error") return <span className="grid size-5 place-items-center rounded-full border border-neutral-950 bg-white text-neutral-950"><IconX className="size-3" strokeWidth={3} /></span>;
     return <span className={`size-5 rounded-full border-2 ${st === "skipped" ? "border-slate-200 bg-slate-100" : "border-slate-200"}`} />;
   };
   return (
@@ -167,7 +167,7 @@ function Workflow({ steps, collapsed }: { steps: PipelineStep[]; collapsed: bool
           ))}
         </ol>
       ) : (
-        <div className="h-1.5 bg-slate-100"><div className="h-1.5 bg-emerald-500" style={{ width: `${(done / Math.max(1, steps.length)) * 100}%` }} /></div>
+        <div className="h-1 bg-neutral-100"><div className="h-1 bg-neutral-950" style={{ width: `${(done / Math.max(1, steps.length)) * 100}%` }} /></div>
       )}
     </Card>
   );
@@ -307,12 +307,12 @@ function SideBySideMini({ before, after }: { before: string; after: string }) {
   return (
     <div className="grid gap-3 md:grid-cols-2">
       <div>
-        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-red-700/80">Before</div>
-        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-red-50/70 p-2.5 font-mono text-[11px] leading-relaxed text-slate-700 [overflow-wrap:anywhere]">{before}</pre>
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-neutral-500">Before</div>
+        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-neutral-50 p-2.5 font-mono text-[11px] leading-relaxed text-neutral-500 line-through [overflow-wrap:anywhere]">{before}</pre>
       </div>
       <div>
-        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-emerald-700/80">After</div>
-        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-emerald-50/70 p-2.5 font-mono text-[11px] leading-relaxed text-slate-700 [overflow-wrap:anywhere]">{after}</pre>
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-neutral-950">After</div>
+        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-neutral-100 p-2.5 font-mono text-[11px] leading-relaxed text-neutral-950 [overflow-wrap:anywhere]">{after}</pre>
       </div>
     </div>
   );
@@ -368,7 +368,7 @@ function MatchAnalysis({ m }: { m: MatchReport }) {
             return (
               <div key={h.term} className="flex justify-between border-b border-slate-100 py-1">
                 <span>
-                  <span className={h.matched ? "text-emerald-700" : "text-slate-400"}>{h.matched ? "●" : "○"}</span> {h.term}{" "}
+                  <span className={h.matched ? "text-neutral-950" : "text-neutral-300"}>{h.matched ? "●" : "○"}</span> {h.term}{" "}
                   <span className="text-slate-400">({h.group}, ×{h.weight})</span>
                 </span>
                 <span className="tabular-nums text-slate-500">{o?.count ?? 0} → {h.count}</span>
@@ -465,8 +465,8 @@ function Editor({ t, latest, onSaved }: { t: Tailored; latest: Version; onSaved:
         <div className={`space-y-2 ${pane === "preview" ? "" : "hidden lg:block"}`}>
           <PdfPreview src={latest.hasPdf ? `/api/versions/${latest.id}/pdf` : null} title={`v${latest.number} preview`} />
           {!latest.compileOk && (
-            <details className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs">
-              <summary className="cursor-pointer font-medium text-red-700">Compile log</summary>
+            <details className="rounded-xl border border-neutral-300 bg-neutral-50 p-3 text-xs">
+              <summary className="cursor-pointer font-medium text-neutral-950">Compile log</summary>
               <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap">{latest.compileLog.slice(-4000)}</pre>
             </details>
           )}

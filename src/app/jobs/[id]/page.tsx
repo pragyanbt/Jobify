@@ -210,7 +210,6 @@ function Description({ text }: { text: string }) {
     <div>
       <div className={`relative whitespace-pre-wrap text-sm leading-relaxed text-slate-700 [overflow-wrap:anywhere] ${long && !open ? "max-h-72 overflow-hidden" : ""}`}>
         {text}
-        {long && !open && <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />}
       </div>
       {long && (
         <button className="link mt-2 text-sm" onClick={() => setOpen((o) => !o)}>{open ? "Show less" : "Show full description"}</button>

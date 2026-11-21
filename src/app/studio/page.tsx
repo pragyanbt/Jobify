@@ -82,7 +82,7 @@ function Masters() {
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2">
                 <span className="truncate font-medium text-slate-900">{m.name}</span>
-                {m.isDefault && <IconStar className="size-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label="Default" />}
+                {m.isDefault && <IconStar className="size-3.5 shrink-0 fill-neutral-950 text-neutral-950" aria-label="Default" />}
               </span>
               <span className="mt-1 flex flex-wrap gap-1.5">
                 <Badge>{m.sourceFormat === "latex" ? "LaTeX" : `from ${m.sourceFormat.toUpperCase()}`}</Badge>
