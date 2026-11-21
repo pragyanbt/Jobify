@@ -6,7 +6,7 @@ import { api, REFRESH_EVENT, useApi } from "@/lib/fetcher";
 import { timeAgo } from "@/lib/time";
 import { IconCheck, IconExternal, IconInbox, IconRefresh, IconSparkles, IconX } from "./icons";
 import { openJunu } from "./Junu";
-import { buttonClass, cx, Spinner, useMediaQuery } from "./ui";
+import { buttonClass, Spinner, useMediaQuery } from "./ui";
 
 interface Update {
   id: string;
