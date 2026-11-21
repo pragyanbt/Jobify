@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { api, REFRESH_EVENT, useApi } from "@/lib/fetcher";
 import { timeAgo } from "@/lib/time";
-import { IconCheck, IconExternal, IconInbox, IconRefresh, IconSparkles, IconX } from "./icons";
+import { IconCheck, IconExpand, IconExternal, IconInbox, IconRefresh, IconSparkles, IconX } from "./icons";
 import { openJunu } from "./Junu";
 import { buttonClass, Spinner, useMediaQuery } from "./ui";
 
@@ -19,11 +19,14 @@ interface Update {
   jobTitle: string;
   summary: string;
   fromName: string;
+  subject?: string;
   jobId: string | null;
   applicationId: string | null;
   suggestedOutcome: string | null;
   status: string;
 }
+
+type PanelMode = { compact?: boolean; full?: boolean };
 interface Integrations {
   google: { configured: boolean; connected: boolean; lastSyncAt?: string | null; lastError?: string | null };
 }
@@ -42,7 +45,7 @@ const OUTCOME_LABEL: Record<string, string> = { interview: "Interview", offer: "
 const REPLYABLE = new Set(["interview", "offer", "assessment", "recruiter"]);
 
 /** Application updates found in Gmail. */
-export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
+export function UpdatesPanel({ compact = false, full = false }: PanelMode) {
   const integ = useApi<Integrations>("/api/integrations");
   const connected = !!integ.data?.google.connected;
   const updates = useApi<Update[]>(connected ? "/api/inbox/updates" : null);
@@ -84,11 +87,20 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
   const shown = compact && !showAll ? list.slice(0, 3) : list;
 
   return (
-    <section className="flex min-h-0 flex-col rounded-xl border border-neutral-200 bg-white">
+    <section className={`flex min-h-0 flex-col rounded-xl border border-neutral-200 bg-white ${full ? "h-full min-h-[70dvh]" : ""}`}>
       <div className="flex items-center gap-2 px-5 pb-2 pt-4">
         <h2 className="flex-1 text-[17px] font-semibold text-slate-900">
           Updates {fresh > 0 && <span className="ml-1 rounded-full bg-brand-600 px-1.5 py-0.5 align-middle text-[11px] font-semibold text-white">{fresh} new</span>}
         </h2>
+        {!full && (
+          <Link
+            href="/updates"
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            title="Open updates full page"
+          >
+            <IconExpand className="size-3.5" /> Extend
+          </Link>
+        )}
         {connected && (
           <button onClick={sync} disabled={syncing} className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 disabled:opacity-60" title="Check Gmail now">
             {syncing ? <Spinner className="size-3" /> : <IconRefresh className="size-3.5" />} Check
@@ -138,7 +150,11 @@ export function UpdatesPanel({ compact = false }: { compact?: boolean }) {
                         {timeAgo(u.receivedAt)}
                         {!u.jobId && <span className="text-slate-400">· not in your jobs</span>}
                       </div>
-                      {u.summary && <p className="mt-1.5 line-clamp-3 text-sm leading-snug text-slate-600">{u.summary}</p>}
+                      {u.summary && (
+                        <p className={`mt-1.5 text-sm leading-snug text-slate-600 ${full ? "whitespace-pre-wrap" : "line-clamp-3"}`}>
+                          {u.summary}
+                        </p>
+                      )}
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {done ? (
                           <span className="flex items-center gap-1 text-xs font-medium text-neutral-700"><IconCheck className="size-3.5" /> Recorded</span>

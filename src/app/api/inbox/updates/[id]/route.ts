@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { authed } from "@/lib/api";
+import { authed, NotFoundError } from "@/lib/api";
 import { markApplied } from "@/lib/applications";
 import { prisma } from "@/lib/db";
+import { getUpdate } from "@/lib/inbox";
 
 const Body = z.object({ action: z.enum(["dismiss", "record_outcome", "mark_applied"]) });
+
+export const GET = authed<{ id: string }>(async (_req, user, { params }) => {
+  const { id } = await params;
+  const u = await getUpdate(user.id, id);
+  if (!u) throw new NotFoundError("Update not found");
+  return NextResponse.json(u);
+});
 
 /**
  * Act on an update. record_outcome applies the suggested outcome to the linked

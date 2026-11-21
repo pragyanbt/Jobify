@@ -149,15 +149,25 @@ export async function syncInbox(userId: string, source?: MailSource): Promise<Sy
   }
 }
 
+const UPDATE_SELECT = {
+  id: true, messageId: true, threadId: true, receivedAt: true, kind: true, via: true, company: true, jobTitle: true,
+  summary: true, fromName: true, subject: true, jobId: true, applicationId: true, suggestedOutcome: true, status: true,
+} as const;
+
 /** Updates to show (newest first), excluding dismissed and ignored. */
 export function listUpdates(userId: string, limit = 30) {
   return prisma.inboxUpdate.findMany({
     where: { userId, kind: { not: "ignored" }, status: { not: "dismissed" } },
     orderBy: { receivedAt: "desc" },
     take: limit,
-    select: {
-      id: true, messageId: true, threadId: true, receivedAt: true, kind: true, via: true, company: true, jobTitle: true,
-      summary: true, fromName: true, subject: true, jobId: true, applicationId: true, suggestedOutcome: true, status: true,
-    },
+    select: UPDATE_SELECT,
+  });
+}
+
+/** One update owned by this user, or null. */
+export function getUpdate(userId: string, id: string) {
+  return prisma.inboxUpdate.findFirst({
+    where: { id, userId, kind: { not: "ignored" } },
+    select: UPDATE_SELECT,
   });
 }

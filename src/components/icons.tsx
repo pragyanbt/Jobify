@@ -108,6 +108,9 @@ export const IconArrowLeft = (p: P) => (
 export const IconLink = (p: P) => (
   <svg {...base(p)}><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
 );
+export const IconExpand = (p: P) => (
+  <svg {...base(p)}><path d="M9 3H3v6M15 3h6v6M9 21H3v-6M21 15v6h-6M3 3l7 7M21 3l-7 7M3 21l7-7M21 21l-7-7" /></svg>
+);
 
 /** Jobify app logo (public/logo.png). `tile` puts it on a white rounded square for dark backgrounds. */
 export function Logo({ size = 28, tile = false }: { size?: number; tile?: boolean }) {

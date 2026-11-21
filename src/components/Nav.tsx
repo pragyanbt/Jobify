@@ -22,7 +22,7 @@ const ADMIN_LINK = { href: "/admin", label: "Dev dashboard", short: "Admin", ico
 function useActive() {
   const path = usePathname();
   // Job pages belong to Home.
-  return (href: string) => path === href || path.startsWith(href + "/") || (href === "/home" && (path.startsWith("/jobs") || path.startsWith("/chat")));
+  return (href: string) => path === href || path.startsWith(href + "/") || (href === "/home" && (path.startsWith("/jobs") || path.startsWith("/chat") || path.startsWith("/updates")));
 }
 
 const COLLAPSE_KEY = "jobify.sidebar.collapsed";
